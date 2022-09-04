@@ -1,48 +1,5 @@
-/**
-*	TechMaker
-*	https://techmaker.ua
-*
-*	STM32 LCD TFT Library for displays using SPI interface
-*	based on Adafruit GFX & Adafruit TFT LCD libraries
-*	15 Jan 2018 by Alexander Olenyev <sasha@techmaker.ua>
-*
-*	Changelog:
-*		- v1.0 added support for ST7735 chips
-*/
-
-// Graphics library by ladyada/adafruit with init code from Rossum
-// MIT license
-/*
- This is the core graphics library for all our displays, providing a common
- set of graphics primitives (points, lines, circles, etc.).  It needs to be
- paired with a hardware-specific library for each display device we carry
- (to handle the lower-level functions).
- Adafruit invests time and resources providing this open source code, please
- support Adafruit & open-source hardware by purchasing products from Adafruit!
- Copyright (c) 2013 Adafruit Industries.  All rights reserved.
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
- - Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
- - Redistributions in binary form must reproduce the above copyright notice,
- this list of conditions and the following disclaimer in the documentation
- and/or other materials provided with the distribution.
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
- */
-
 #include "lcd.h"
 
-// Hold pointer to inited HAL SPI device
 static SPI_HandleTypeDef * LCD_hspi;
 
 static int16_t m_width;
@@ -82,7 +39,6 @@ inline static void LCD_WriteData(uint8_t * pData, uint32_t size);
 inline static void LCD_WriteRegister(uint8_t addr, uint8_t * pData,
 		uint32_t size);
 
-// Initialization command tables for different LCD controllers
 #if	defined(ST7735)
 static const uint16_t ST7735_regValues[] = {
 
@@ -101,8 +57,6 @@ static const uint16_t ST7735_regValues[] = {
 	ST7735_COLMOD, 1, 0x05, /* Set color mode, 1 arg, no delay: 16-bit color */
 	ST7735_CASET, 4, 0x00, 0x00, 0x00, 0xEF, /* Column addr set, 4 args, no delay: XSTART = 0, XEND = 239 */
 	ST7735_RASET, 4, 0x00, 0x00, 0x00, 0xEF, /* Row addr set, 4 args, no delay: YSTART = 0, YEND = 239 */
-	//ST7735_GAMCTRP1, 16, 0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2d, 0x29, 0x25,0x2B, 0x39, 0x00, 0x01, 0x03, 0x10, /* Magical unicorn dust, 16 args, no delay */
-	//ST7735_GAMCTRN2, 16, 0x00, 0x1D, 0x07, 0x06, 0x2E, 0xFF, 0xFF, 0xFF,0xFF, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10, /* Sparkles and rainbows, 16 args, no delay */
 	ST7735_DISPON, 0, /* Main screen turn on, no delay */
 	ST7735_MADCTL, 1, ST7735_MADCTL_MX | ST7735_MADCTL_MY /* Memory access control: MY = 1, MX = 1, MV = 0, ML = 0 */
 };

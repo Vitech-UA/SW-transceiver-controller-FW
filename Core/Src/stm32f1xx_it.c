@@ -42,8 +42,10 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-extern uint16_t FREQ_STEP;
-extern bool send_to_display_flag;
+extern bool enc_rotation_left_flag;
+extern bool enc_rotation_right_flag;
+extern bool enc_btn_pressed_flag;
+
 extern uint32_t A;
 uint8_t status, status_old;
 unsigned long Time, Time_old;
@@ -69,117 +71,130 @@ unsigned long Time, Time_old;
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
- * @brief This function handles Non maskable interrupt.
- */
-void NMI_Handler(void) {
-	/* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+  * @brief This function handles Non maskable interrupt.
+  */
+void NMI_Handler(void)
+{
+  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
-	/* USER CODE END NonMaskableInt_IRQn 0 */
-	/* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+  /* USER CODE END NonMaskableInt_IRQn 0 */
+  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
 	while (1) {
 	}
-	/* USER CODE END NonMaskableInt_IRQn 1 */
+  /* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
- * @brief This function handles Hard fault interrupt.
- */
-void HardFault_Handler(void) {
-	/* USER CODE BEGIN HardFault_IRQn 0 */
+  * @brief This function handles Hard fault interrupt.
+  */
+void HardFault_Handler(void)
+{
+  /* USER CODE BEGIN HardFault_IRQn 0 */
 
-	/* USER CODE END HardFault_IRQn 0 */
-	while (1) {
-		/* USER CODE BEGIN W1_HardFault_IRQn 0 */
-		/* USER CODE END W1_HardFault_IRQn 0 */
-	}
+  /* USER CODE END HardFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_HardFault_IRQn 0 */
+    /* USER CODE END W1_HardFault_IRQn 0 */
+  }
 }
 
 /**
- * @brief This function handles Memory management fault.
- */
-void MemManage_Handler(void) {
-	/* USER CODE BEGIN MemoryManagement_IRQn 0 */
+  * @brief This function handles Memory management fault.
+  */
+void MemManage_Handler(void)
+{
+  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
-	/* USER CODE END MemoryManagement_IRQn 0 */
-	while (1) {
-		/* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
-		/* USER CODE END W1_MemoryManagement_IRQn 0 */
-	}
+  /* USER CODE END MemoryManagement_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+    /* USER CODE END W1_MemoryManagement_IRQn 0 */
+  }
 }
 
 /**
- * @brief This function handles Prefetch fault, memory access fault.
- */
-void BusFault_Handler(void) {
-	/* USER CODE BEGIN BusFault_IRQn 0 */
+  * @brief This function handles Prefetch fault, memory access fault.
+  */
+void BusFault_Handler(void)
+{
+  /* USER CODE BEGIN BusFault_IRQn 0 */
 
-	/* USER CODE END BusFault_IRQn 0 */
-	while (1) {
-		/* USER CODE BEGIN W1_BusFault_IRQn 0 */
-		/* USER CODE END W1_BusFault_IRQn 0 */
-	}
+  /* USER CODE END BusFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
+    /* USER CODE END W1_BusFault_IRQn 0 */
+  }
 }
 
 /**
- * @brief This function handles Undefined instruction or illegal state.
- */
-void UsageFault_Handler(void) {
-	/* USER CODE BEGIN UsageFault_IRQn 0 */
+  * @brief This function handles Undefined instruction or illegal state.
+  */
+void UsageFault_Handler(void)
+{
+  /* USER CODE BEGIN UsageFault_IRQn 0 */
 
-	/* USER CODE END UsageFault_IRQn 0 */
-	while (1) {
-		/* USER CODE BEGIN W1_UsageFault_IRQn 0 */
-		/* USER CODE END W1_UsageFault_IRQn 0 */
-	}
+  /* USER CODE END UsageFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+    /* USER CODE END W1_UsageFault_IRQn 0 */
+  }
 }
 
 /**
- * @brief This function handles System service call via SWI instruction.
- */
-void SVC_Handler(void) {
-	/* USER CODE BEGIN SVCall_IRQn 0 */
+  * @brief This function handles System service call via SWI instruction.
+  */
+void SVC_Handler(void)
+{
+  /* USER CODE BEGIN SVCall_IRQn 0 */
 
-	/* USER CODE END SVCall_IRQn 0 */
-	/* USER CODE BEGIN SVCall_IRQn 1 */
+  /* USER CODE END SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 1 */
 
-	/* USER CODE END SVCall_IRQn 1 */
+  /* USER CODE END SVCall_IRQn 1 */
 }
 
 /**
- * @brief This function handles Debug monitor.
- */
-void DebugMon_Handler(void) {
-	/* USER CODE BEGIN DebugMonitor_IRQn 0 */
+  * @brief This function handles Debug monitor.
+  */
+void DebugMon_Handler(void)
+{
+  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
 
-	/* USER CODE END DebugMonitor_IRQn 0 */
-	/* USER CODE BEGIN DebugMonitor_IRQn 1 */
+  /* USER CODE END DebugMonitor_IRQn 0 */
+  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
-	/* USER CODE END DebugMonitor_IRQn 1 */
+  /* USER CODE END DebugMonitor_IRQn 1 */
 }
 
 /**
- * @brief This function handles Pendable request for system service.
- */
-void PendSV_Handler(void) {
-	/* USER CODE BEGIN PendSV_IRQn 0 */
+  * @brief This function handles Pendable request for system service.
+  */
+void PendSV_Handler(void)
+{
+  /* USER CODE BEGIN PendSV_IRQn 0 */
 
-	/* USER CODE END PendSV_IRQn 0 */
-	/* USER CODE BEGIN PendSV_IRQn 1 */
+  /* USER CODE END PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 1 */
 
-	/* USER CODE END PendSV_IRQn 1 */
+  /* USER CODE END PendSV_IRQn 1 */
 }
 
 /**
- * @brief This function handles System tick timer.
- */
-void SysTick_Handler(void) {
-	/* USER CODE BEGIN SysTick_IRQn 0 */
+  * @brief This function handles System tick timer.
+  */
+void SysTick_Handler(void)
+{
+  /* USER CODE BEGIN SysTick_IRQn 0 */
 
-	/* USER CODE END SysTick_IRQn 0 */
-	HAL_IncTick();
-	/* USER CODE BEGIN SysTick_IRQn 1 */
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+  /* USER CODE BEGIN SysTick_IRQn 1 */
 
-	/* USER CODE END SysTick_IRQn 1 */
+  /* USER CODE END SysTick_IRQn 1 */
 }
 
 /******************************************************************************/
@@ -190,77 +205,26 @@ void SysTick_Handler(void) {
 /******************************************************************************/
 
 /**
- * @brief This function handles EXTI line[9:5] interrupts.
- */
-void EXTI9_5_IRQHandler(void) {
-	/* USER CODE BEGIN EXTI9_5_IRQn 0 */
-	if (!(GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
-		status = 0x00;
-	} else if ((GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
-		status = 0x10;
-	} else if ((GPIOA->IDR & GPIO_PIN_8) && (GPIOB->IDR & GPIO_PIN_12)) {
-		status = 0x11;
-	} else if (!(GPIOA->IDR & GPIO_PIN_8) && (GPIOB->IDR & GPIO_PIN_12)) {
-		status = 0x01;
-	}
+  * @brief This function handles EXTI line1 interrupt.
+  */
+void EXTI1_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI1_IRQn 0 */
+ enc_btn_pressed_flag = true;
+  /* USER CODE END EXTI1_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
+  /* USER CODE BEGIN EXTI1_IRQn 1 */
 
-	if (status_old == 0x10 && status == 0x11) {
-		Time = HAL_GetTick();
-		if (Time - Time_old < reaction) {
-			//A = A + scroll;
-		} else {
-			A+=FREQ_STEP;
-		}
-		Time_old = Time;
-		send_to_display_flag = 1;
-	} else if (status_old == 0x01 && status == 0x00) {
-		Time = HAL_GetTick();
-		if (Time - Time_old < reaction) {
-			//A = A + scroll;
-		} else {
-			A+=FREQ_STEP;
-		}
-		Time_old = Time;
-		send_to_display_flag = 1;
-	}
-	if (status_old == 0x11 && status == 0x10) {
-		status_old = 0x10;
-
-	} else if (status_old == 0x00 && status == 0x01) {
-		status_old = 0x01;
-
-	} else if (status_old == 0x10 && status == 0x00) {
-		Time = HAL_GetTick();
-		if (Time - Time_old < reaction) {
-			//A = A - scroll;
-		} else {
-			A-=FREQ_STEP;
-		}
-		Time_old = Time;
-		send_to_display_flag = 1;
-	} else if (status_old == 0x01 && status == 0x11) {
-		Time = HAL_GetTick();
-		if (Time - Time_old < reaction) {
-			//A = A - scroll;
-		} else {
-			A-=FREQ_STEP;
-		}
-		Time_old = Time;
-		send_to_display_flag = 1;
-	}
-	status_old = status;
-	/* USER CODE END EXTI9_5_IRQn 0 */
-	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
-	/* USER CODE BEGIN EXTI9_5_IRQn 1 */
-
-	/* USER CODE END EXTI9_5_IRQn 1 */
+  /* USER CODE END EXTI1_IRQn 1 */
 }
 
 /**
- * @brief This function handles EXTI line[15:10] interrupts.
- */
-void EXTI15_10_IRQHandler(void) {
-	/* USER CODE BEGIN EXTI15_10_IRQn 0 */
+  * @brief This function handles EXTI line[9:5] interrupts.
+  */
+void EXTI9_5_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI9_5_IRQn 0 */
+
 	if (!(GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
 		status = 0x00;
 	} else if ((GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
@@ -276,19 +240,19 @@ void EXTI15_10_IRQHandler(void) {
 		if (Time - Time_old < reaction) {
 			//A = A + scroll;
 		} else {
-			A+=FREQ_STEP;
+			A+=1;
 		}
 		Time_old = Time;
-		send_to_display_flag = 1;
+		enc_rotation_left_flag = true;
 	} else if (status_old == 0x01 && status == 0x00) {
 		Time = HAL_GetTick();
 		if (Time - Time_old < reaction) {
 			//A = A + scroll;
 		} else {
-			A+=FREQ_STEP;
+			A+=1;
 		}
 		Time_old = Time;
-		send_to_display_flag = 1;
+		enc_rotation_left_flag = true;
 	}
 	if (status_old == 0x11 && status == 0x10) {
 		status_old = 0x10;
@@ -301,26 +265,94 @@ void EXTI15_10_IRQHandler(void) {
 		if (Time - Time_old < reaction) {
 			//A = A - scroll;
 		} else {
-			A-=FREQ_STEP;
+			A-=1;
 		}
 		Time_old = Time;
-		send_to_display_flag = 1;
+		enc_rotation_left_flag = true;
 	} else if (status_old == 0x01 && status == 0x11) {
 		Time = HAL_GetTick();
 		if (Time - Time_old < reaction) {
 			//A = A - scroll;
 		} else {
-			A-=FREQ_STEP;
+			A-=1;
 		}
 		Time_old = Time;
-		send_to_display_flag = 1;
+		enc_rotation_left_flag = true;
 	}
 	status_old = status;
-	/* USER CODE END EXTI15_10_IRQn 0 */
-	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
-	/* USER CODE BEGIN EXTI15_10_IRQn 1 */
+  /* USER CODE END EXTI9_5_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+  /* USER CODE BEGIN EXTI9_5_IRQn 1 */
 
-	/* USER CODE END EXTI15_10_IRQn 1 */
+  /* USER CODE END EXTI9_5_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line[15:10] interrupts.
+  */
+void EXTI15_10_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+	if (!(GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
+		status = 0x00;
+	} else if ((GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
+		status = 0x10;
+	} else if ((GPIOA->IDR & GPIO_PIN_8) && (GPIOB->IDR & GPIO_PIN_12)) {
+		status = 0x11;
+	} else if (!(GPIOA->IDR & GPIO_PIN_8) && (GPIOB->IDR & GPIO_PIN_12)) {
+		status = 0x01;
+	}
+
+	if (status_old == 0x10 && status == 0x11) {
+		Time = HAL_GetTick();
+		if (Time - Time_old < reaction) {
+			//A = A + scroll;
+		} else {
+			A+=1;
+		}
+		Time_old = Time;
+		enc_rotation_right_flag = true;
+	} else if (status_old == 0x01 && status == 0x00) {
+		Time = HAL_GetTick();
+		if (Time - Time_old < reaction) {
+			//A = A + scroll;
+		} else {
+			A+=1;
+		}
+		Time_old = Time;
+		enc_rotation_right_flag = 1;
+	}
+	if (status_old == 0x11 && status == 0x10) {
+		status_old = 0x10;
+
+	} else if (status_old == 0x00 && status == 0x01) {
+		status_old = 0x01;
+
+	} else if (status_old == 0x10 && status == 0x00) {
+		Time = HAL_GetTick();
+		if (Time - Time_old < reaction) {
+			//A = A - scroll;
+		} else {
+			A-=1;
+		}
+		Time_old = Time;
+		enc_rotation_right_flag = 1;
+	} else if (status_old == 0x01 && status == 0x11) {
+		Time = HAL_GetTick();
+		if (Time - Time_old < reaction) {
+			//A = A - scroll;
+		} else {
+			A-=1;
+		}
+		Time_old = Time;
+		enc_rotation_right_flag = true;
+	}
+	status_old = status;
+  /* USER CODE END EXTI15_10_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+
+  /* USER CODE END EXTI15_10_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

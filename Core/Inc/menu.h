@@ -8,6 +8,8 @@
 #ifndef MENU_H_
 #define MENU_H_
 
-#define string_height_px 30
 
+
+void draw_menu(void);
+void select_menu_item(uint8_t item);
 #endif /* MENU_H_ */
