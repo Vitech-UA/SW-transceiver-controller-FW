@@ -49,12 +49,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-bool enc_rotation_left_flag, enc_rotation_right_flag, enc_btn_pressed_flag;
-bool flg_left = false;
-uint32_t A=0;
+bool enc_rotation_left_flag = false;
+bool enc_rotation_right_flag = false;
+bool enc_btn_pressed_flag;
+
+uint32_t clockwise_flag = 0;
+uint32_t counterclockwise_flag = 0;
 uint16_t freq_step = 1000;
 uint32_t freq_to_set = INITIAL_VALUE;
-extern uint8_t status_old;
 extern char menu_itens;
 
 /* USER CODE END PV */
@@ -111,24 +113,13 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	const int32_t correction = 100;
 
-	A = INITIAL_VALUE;
 	si5351_Init(correction);
 	// Enable CLK0 and CLK2
 	si5351_EnableOutputs(1 << 0);
 	LCD_Init(&hspi1);
 	LCD_FillScreen(BLACK);
-	dds_print_freq(A, 20, 10);
+	dds_print_freq(freq_to_set, 20, 10);
 	//si5351_SetupCLK0(A, SI5351_DRIVE_STRENGTH_8MA);
-
-	if (!(GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
-		status_old = 0x00;
-	} else if ((GPIOA->IDR & GPIO_PIN_8) && (!(GPIOB->IDR & GPIO_PIN_12))) {
-		status_old = 0x10;
-	} else if ((GPIOA->IDR & GPIO_PIN_8) && (GPIOB->IDR & GPIO_PIN_12)) {
-		status_old = 0x11;
-	} else if (!(GPIOA->IDR & GPIO_PIN_8) && (GPIOB->IDR & GPIO_PIN_12)) {
-		status_old = 0x01;
-	}
 	draw_menu();
 	/* USER CODE END 2 */
 
@@ -137,20 +128,14 @@ int main(void) {
 
 	while (1) {
 
-		switch (state) {
-		default:
-		case STATE_PRINT_FREQ:
-			print_freq_handler();
-			break;
-		//case STATE_SELECT_MENU_ITEM:
-			//select_menu_item_handler();
-			//break;
-		}
+		print_freq_handler();
 
-		/* USER CODE END WHILE */
-
-		/* USER CODE BEGIN 3 */
 	}
+
+	/* USER CODE END WHILE */
+
+	/* USER CODE BEGIN 3 */
+
 	/* USER CODE END 3 */
 }
 
@@ -192,6 +177,7 @@ void SystemClock_Config(void) {
 
 /* USER CODE BEGIN 4 */
 void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos) {
+
 	LCD_SetCursor(x_pos, y_pos);
 	LCD_SetTextSize(1);
 	LCD_SetTextColor(YELLOW, BLUE);
@@ -199,48 +185,64 @@ void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos) {
 	LCD_DrawLine(00, 35, 240, 35, WHITE);
 }
 void print_freq_handler(void) {
-
-	if (enc_rotation_left_flag) {
-		freq_to_set += A;
-
-	if (enc_rotation_left_flag) {
-		freq_to_set -= A;
+	if (clockwise_flag == 1){
+		freq_to_set++;
+		clockwise_flag=0;
 	}
-	dds_print_freq(freq_to_set, 20, 10);
-			si5351_SetupCLK0((A * freq_step) - INTERMEDIATE_FREQUENCY_Hz,
-					SI5351_DRIVE_STRENGTH_2MA);
-			enc_rotation_left_flag = false;
-			enc_rotation_right_flag = false;
-		}
-		if (enc_btn_pressed_flag)
-			state = STATE_SELECT_MENU_ITEM;
-	}
-	void select_menu_item_handler(void) {
-
-		select_menu_item(A);
-
-		if (enc_rotation_left_flag || enc_rotation_right_flag) {
-			select_menu_item(A);
-			enc_rotation_left_flag = false;
-			enc_rotation_right_flag = false;
+	if (counterclockwise_flag == 1){
+			freq_to_set--;
+			counterclockwise_flag=0;
 		}
 
-		enc_btn_pressed_flag = false;
-	}
-	/* USER CODE END 4 */
+		dds_print_freq(freq_to_set, 20, 10);
+	si5351_SetupCLK0((clockwise_flag * freq_step) - INTERMEDIATE_FREQUENCY_Hz,
+			SI5351_DRIVE_STRENGTH_2MA);
 
-	/**
-	 * @brief  This function is executed in case of error occurrence.
-	 * @retval None
-	 */
-	void Error_Handler(void) {
-		/* USER CODE BEGIN Error_Handler_Debug */
-		/* User can add his own implementation to report the HAL error return state */
-		__disable_irq();
-		while (1) {
-		}
-		/* USER CODE END Error_Handler_Debug */
+}
+void select_menu_item_handler(void) {
+
+}
+
+void EXTI1_IRQHandler(void) {
+
+	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
+
+}
+
+void EXTI9_5_IRQHandler(void) {
+
+	if (!HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)) {
+		// Сюди потрапляємо, коли енкодер крутитим проти часової
+		counterclockwise_flag=1;
 	}
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+
+}
+
+void EXTI15_10_IRQHandler(void) {
+
+	if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
+
+		clockwise_flag = 1;
+		// Сюди потрапляємо, коли енкодер крутитим за часовою
+	}
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+}
+
+/* USER CODE END 4 */
+
+/**
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
+	}
+	/* USER CODE END Error_Handler_Debug */
+}
 
 #ifdef  USE_FULL_ASSERT
 /**
