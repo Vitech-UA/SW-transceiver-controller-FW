@@ -49,15 +49,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-bool enc_rotation_left_flag = false;
-bool enc_rotation_right_flag = false;
-bool enc_btn_pressed_flag;
 
-uint32_t clockwise_flag = 0;
-uint32_t counterclockwise_flag = 0;
+uint8_t clockwise_flag = 0;
+uint8_t counterclockwise_flag = 0;
+uint8_t enc_btn_pressed_flag = 0;
 uint16_t freq_step = 1000;
 uint32_t freq_to_set = INITIAL_VALUE;
-extern char menu_itens;
+extern char menu_items;
 
 /* USER CODE END PV */
 
@@ -120,15 +118,23 @@ int main(void) {
 	LCD_FillScreen(BLACK);
 	dds_print_freq(freq_to_set, 20, 10);
 	//si5351_SetupCLK0(A, SI5351_DRIVE_STRENGTH_8MA);
-	draw_menu();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 
 	while (1) {
+		switch (state) {
+		case STATE_PRINT_FREQ:
+			print_freq_handler();
+			break;
+		case STATE_SELECT_MENU_ITEM:
+			select_menu_item_handler();
+			break;
+		case STATE_SET_INTERMEDIATE_FREQ:
 
-		print_freq_handler();
+			break;
+		}
 
 	}
 
@@ -185,26 +191,55 @@ void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos) {
 	LCD_DrawLine(00, 35, 240, 35, WHITE);
 }
 void print_freq_handler(void) {
-	if (clockwise_flag == 1){
+	if (clockwise_flag == 1) {
 		freq_to_set++;
-		clockwise_flag=0;
+		clockwise_flag = 0;
 	}
-	if (counterclockwise_flag == 1){
-			freq_to_set--;
-			counterclockwise_flag=0;
-		}
+	if (counterclockwise_flag == 1) {
+		freq_to_set--;
+		counterclockwise_flag = 0;
+	}
+	if (enc_btn_pressed_flag) {
+		state = STATE_SELECT_MENU_ITEM;
+	}
 
-		dds_print_freq(freq_to_set, 20, 10);
+	dds_print_freq(freq_to_set, 20, 10);
 	si5351_SetupCLK0((clockwise_flag * freq_step) - INTERMEDIATE_FREQUENCY_Hz,
 			SI5351_DRIVE_STRENGTH_2MA);
 
 }
 void select_menu_item_handler(void) {
+	static int menu_item_index = 0;
+	static uint8_t menu_is_drawed_flag = 0;
+
+	if (!menu_is_drawed_flag) {
+		draw_menu();
+		menu_is_drawed_flag = 0;
+	}
+
+	if (counterclockwise_flag) {
+		menu_item_index++;
+		if (menu_item_index >= MENU_ITEMS_CNT - 1)
+			menu_item_index = MENU_ITEMS_CNT - 1;
+
+		select_menu_item(menu_item_index);
+		counterclockwise_flag = 0;
+		clockwise_flag = 0;
+	}
+	if (clockwise_flag) {
+		menu_item_index--;
+		if (menu_item_index <= 0)
+			menu_item_index = 0;
+
+		select_menu_item(menu_item_index);
+		counterclockwise_flag = 0;
+		clockwise_flag = 0;
+	}
 
 }
 
 void EXTI1_IRQHandler(void) {
-
+	enc_btn_pressed_flag = 1;
 	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
 
 }
@@ -213,7 +248,7 @@ void EXTI9_5_IRQHandler(void) {
 
 	if (!HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)) {
 		// Сюди потрапляємо, коли енкодер крутитим проти часової
-		counterclockwise_flag=1;
+		counterclockwise_flag = 1;
 	}
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
 

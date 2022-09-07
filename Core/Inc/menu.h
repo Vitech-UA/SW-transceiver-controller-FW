@@ -7,7 +7,7 @@
 
 #ifndef MENU_H_
 #define MENU_H_
-
+#define MENU_ITEMS_CNT 4 // Кть пунктів основного меню.
 
 
 void draw_menu(void);
