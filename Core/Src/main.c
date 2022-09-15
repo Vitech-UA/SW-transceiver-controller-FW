@@ -24,9 +24,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lcd.h"
-#include "si5351.h"
-#include "menu.h"
+
+#include "state_mashine.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,8 +40,6 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define INTERMEDIATE_FREQUENCY_Hz 455000
-#define INITIAL_VALUE 27000000
 
 /* USER CODE END PM */
 
@@ -50,33 +47,34 @@
 
 /* USER CODE BEGIN PV */
 
-uint8_t clockwise_flag = 0;
-uint8_t counterclockwise_flag = 0;
+bool clockwise_flag = 0;
+bool counterclockwise_flag = 0;
 uint8_t enc_btn_pressed_flag = 0;
-uint16_t freq_step = 1000;
-uint32_t freq_to_set = INITIAL_VALUE;
 extern char menu_items;
-
+int menu_item_index = 0;
+uint8_t menu_is_drawed_flag = 0;
+extern STATE_t state;
+extern EVENT_t event;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos);
-void print_freq_handler(void);
-void select_menu_item_handler(void);
+
+void state_set_intermediate(void);
+void state_set_frequency_step(void);
+void state_select_menu_item(void);
+void state_print_info(void);
+void state_increase_freq(void);
+void state_reduse_freq(void);
+void EmptyFunc(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-typedef enum {
-	STATE_PRINT_FREQ,
-	STATE_SET_STEP,
-	STATE_SET_INTERMEDIATE_FREQ,
-	STATE_SELECT_MENU_ITEM
-} STATE_t;
-volatile STATE_t state = STATE_PRINT_FREQ;
 /* USER CODE END 0 */
 
 /**
@@ -85,7 +83,6 @@ volatile STATE_t state = STATE_PRINT_FREQ;
  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
-
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -101,7 +98,13 @@ int main(void) {
 	SystemClock_Config();
 
 	/* USER CODE BEGIN SysInit */
+	void (*const transition_table[5][5])(void) = {
+		[STATE_PRINT_FREQ][EVENT_BUTTON_PRESSED] = print_menu_hanler,
+		[STATE_PRINT_FREQ][EVENT_NONE] = print_freq_hanler,
+		[STATE_PRINT_MENU][EVENT_NONE] = print_menu_hanler,
+		[STATE_PRINT_MENU][EVENT_BUTTON_PRESSED] = print_freq_hanler,
 
+	};
 	/* USER CODE END SysInit */
 
 	/* Initialize all configured peripherals */
@@ -109,33 +112,14 @@ int main(void) {
 	MX_I2C1_Init();
 	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
-	const int32_t correction = 100;
-
-	si5351_Init(correction);
-	// Enable CLK0 and CLK2
-	si5351_EnableOutputs(1 << 0);
-	LCD_Init(&hspi1);
-	LCD_FillScreen(BLACK);
-	dds_print_freq(freq_to_set, 20, 10);
-	//si5351_SetupCLK0(A, SI5351_DRIVE_STRENGTH_8MA);
+	ST7789_Init();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 
 	while (1) {
-		switch (state) {
-		case STATE_PRINT_FREQ:
-			print_freq_handler();
-			break;
-		case STATE_SELECT_MENU_ITEM:
-			select_menu_item_handler();
-			break;
-		case STATE_SET_INTERMEDIATE_FREQ:
-
-			break;
-		}
-
+		transition_table[state][event]();
 	}
 
 	/* USER CODE END WHILE */
@@ -182,39 +166,12 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
-void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos) {
 
-	LCD_SetCursor(x_pos, y_pos);
-	LCD_SetTextSize(1);
-	LCD_SetTextColor(YELLOW, BLUE);
-	LCD_Printf("%u", freq);
-	LCD_DrawLine(00, 35, 240, 35, WHITE);
-}
-void print_freq_handler(void) {
-	if (clockwise_flag == 1) {
-		freq_to_set++;
-		clockwise_flag = 0;
-	}
-	if (counterclockwise_flag == 1) {
-		freq_to_set--;
-		counterclockwise_flag = 0;
-	}
-	if (enc_btn_pressed_flag) {
-		state = STATE_SELECT_MENU_ITEM;
-	}
-
-	dds_print_freq(freq_to_set, 20, 10);
-	si5351_SetupCLK0((clockwise_flag * freq_step) - INTERMEDIATE_FREQUENCY_Hz,
-			SI5351_DRIVE_STRENGTH_2MA);
-
-}
-void select_menu_item_handler(void) {
-	static int menu_item_index = 0;
-	static uint8_t menu_is_drawed_flag = 0;
+void state_select_menu_item(void) {
 
 	if (!menu_is_drawed_flag) {
 		draw_menu();
-		menu_is_drawed_flag = 0;
+		menu_is_drawed_flag = 1;
 	}
 
 	if (counterclockwise_flag) {
@@ -236,32 +193,6 @@ void select_menu_item_handler(void) {
 		clockwise_flag = 0;
 	}
 
-}
-
-void EXTI1_IRQHandler(void) {
-	enc_btn_pressed_flag = 1;
-	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
-
-}
-
-void EXTI9_5_IRQHandler(void) {
-
-	if (!HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)) {
-		// Сюди потрапляємо, коли енкодер крутитим проти часової
-		counterclockwise_flag = 1;
-	}
-	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
-
-}
-
-void EXTI15_10_IRQHandler(void) {
-
-	if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
-
-		clockwise_flag = 1;
-		// Сюди потрапляємо, коли енкодер крутитим за часовою
-	}
-	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
 }
 
 /* USER CODE END 4 */

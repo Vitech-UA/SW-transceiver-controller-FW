@@ -22,6 +22,7 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "state_mashine.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,7 +52,8 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern STATE_t state;
+extern EVENT_t event;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -85,6 +87,8 @@ void HardFault_Handler(void) {
 	/* USER CODE END HardFault_IRQn 0 */
 	while (1) {
 		/* USER CODE BEGIN W1_HardFault_IRQn 0 */
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_Delay(50);
 		/* USER CODE END W1_HardFault_IRQn 0 */
 	}
 }
@@ -188,7 +192,37 @@ void SysTick_Handler(void) {
  * @brief This function handles EXTI line1 interrupt.
  */
 
+void EXTI1_IRQHandler(void) {
+	event = EVENT_BUTTON_PRESSED;
+	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
 
+}
+/**
+ * @brief This function handles EXTI line[9:5] interrupts.
+ */
+void EXTI9_5_IRQHandler(void) {
+
+	if (!HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)) {
+		// Сюди потрапляємо, коли енкодер крутитим проти часової
+		event = EVENT_ENC_COUNTERCLOCK;
+		//counterclockwise_flag = 1;
+	}
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+
+}
+
+/**
+ * @brief This function handles EXTI line[15:10] interrupts.
+ */
+void EXTI15_10_IRQHandler(void) {
+
+	if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
+		event = EVENT_ENC_CLOCK;
+		//clockwise_flag = 1;
+		// Сюди потрапляємо, коли енкодер крутитим за часовою
+	}
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

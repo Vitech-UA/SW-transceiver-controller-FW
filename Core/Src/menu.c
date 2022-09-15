@@ -6,7 +6,7 @@
  */
 #include "menu.h"
 #include "main.h"
-#include "lcd.h"
+
 
 
 char menu_items[MENU_ITEMS_CNT][20] = { "..", "Step", "Intermediate", "Info",};
@@ -17,22 +17,19 @@ void draw_menu(void) {
 	uint8_t start_x = 5;
 	uint8_t start_y = 45;
 	uint8_t vertical_space = 15;
-	LCD_SetTextColor(WHITE, BLACK);
-	LCD_SetTextSize(0);
-	LCD_SetCursor(start_x, start_y);
+
 
 	//Друк пунктів меню  массиву
 	for (uint8_t i = 0; i <= MENU_ITEMS_CNT-1; i++) {
-		LCD_Printf("%s", menu_items[i]);
-		LCD_SetCursor(start_x, start_y += vertical_space);
+
 	}
 
 }
 
 void select_menu_item(uint8_t item) {
 
-	LCD_FillRect(0, 45, 128, 140, BLACK);
-	draw_menu();
-	LCD_DrawRoundRect(4, 44 + (item * 15), 120, 14, 3, GREEN);
+
 
 }
+
+
