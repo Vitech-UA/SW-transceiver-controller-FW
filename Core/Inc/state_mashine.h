@@ -3,6 +3,7 @@
 
 
 /*Прототипи ф-й обробників станів машини*/
+void empty_function(void);
 void print_freq_hanler(void);
 void print_menu_hanler(void);
 void menu_up_hanler(void);

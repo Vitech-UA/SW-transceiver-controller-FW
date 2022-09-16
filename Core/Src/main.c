@@ -99,10 +99,12 @@ int main(void) {
 
 	/* USER CODE BEGIN SysInit */
 	void (*const transition_table[5][5])(void) = {
-		[STATE_PRINT_FREQ][EVENT_BUTTON_PRESSED] = print_menu_hanler,
 		[STATE_PRINT_FREQ][EVENT_NONE] = print_freq_hanler,
-		[STATE_PRINT_MENU][EVENT_NONE] = print_menu_hanler,
-		[STATE_PRINT_MENU][EVENT_BUTTON_PRESSED] = print_freq_hanler,
+		[STATE_PRINT_FREQ][EVENT_BUTTON_PRESSED] = print_menu_hanler,
+		[STATE_PRINT_MENU][EVENT_NONE] = empty_function,
+		[STATE_PRINT_MENU][EVENT_ENC_CLOCK] = empty_function,
+		[STATE_PRINT_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
+
 
 	};
 	/* USER CODE END SysInit */
