@@ -43,8 +43,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
-volatile uint8_t cw_flag;
-volatile uint8_t ccw_flag;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -193,39 +191,50 @@ void SysTick_Handler(void) {
 /**
  * @brief This function handles EXTI line1 interrupt.
  */
-
 void EXTI1_IRQHandler(void) {
+	/* USER CODE BEGIN EXTI1_IRQn 0 */
 	event = EVENT_BUTTON_PRESSED;
-
+	/* USER CODE END EXTI1_IRQn 0 */
 	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
+	/* USER CODE BEGIN EXTI1_IRQn 1 */
 
+	/* USER CODE END EXTI1_IRQn 1 */
 }
+
 /**
  * @brief This function handles EXTI line[9:5] interrupts.
  */
 void EXTI9_5_IRQHandler(void) {
-
+	/* USER CODE BEGIN EXTI9_5_IRQn 0 */
 	if (!HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)) {
 		// Сюди потрапляємо, коли енкодер крутитим проти часової
 		event = EVENT_ENC_COUNTERCLOCK;
-		ccw_flag = 1;
-	}
-	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
 
+	}
+	/* USER CODE END EXTI9_5_IRQn 0 */
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+	/* USER CODE BEGIN EXTI9_5_IRQn 1 */
+
+	/* USER CODE END EXTI9_5_IRQn 1 */
 }
 
 /**
  * @brief This function handles EXTI line[15:10] interrupts.
  */
 void EXTI15_10_IRQHandler(void) {
-
+	/* USER CODE BEGIN EXTI15_10_IRQn 0 */
 	if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
 		event = EVENT_ENC_CLOCK;
-		cw_flag = 1;
+
 		// Сюди потрапляємо, коли енкодер крутитим за часовою
 	}
+	/* USER CODE END EXTI15_10_IRQn 0 */
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+	/* USER CODE BEGIN EXTI15_10_IRQn 1 */
+
+	/* USER CODE END EXTI15_10_IRQn 1 */
 }
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

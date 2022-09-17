@@ -1,12 +1,12 @@
 #ifndef __STATE_MASHINE_H
-#define __LCD_H
+#define __STATE_MASHINE_H
 
 
 /*Прототипи ф-й обробників станів машини*/
 void empty_function(void);
 void print_freq_hanler(void);
 void print_menu_hanler(void);
-
+void reset_event(void);
 typedef enum {
 	STATE_PRINT_FREQ,
 	STATE_SET_STEP,

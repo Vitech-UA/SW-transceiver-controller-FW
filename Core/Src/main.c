@@ -47,7 +47,6 @@
 
 /* USER CODE BEGIN PV */
 
-
 uint8_t enc_btn_pressed_flag = 0;
 extern char menu_items;
 uint8_t menu_is_drawed_flag = 0;
@@ -96,14 +95,13 @@ int main(void) {
 	SystemClock_Config();
 
 	/* USER CODE BEGIN SysInit */
-	void (*const transition_table[7][4])(void) = {
+	void (*const transition_table[4][4])(void) = {
 		[STATE_PRINT_FREQ][EVENT_NONE] = print_freq_hanler,
 		[STATE_PRINT_FREQ][EVENT_BUTTON_PRESSED] = print_menu_hanler,
 		[STATE_PRINT_MENU][EVENT_NONE] = print_menu_hanler,
 		[STATE_PRINT_MENU][EVENT_ENC_CLOCK] = empty_function,
 		[STATE_PRINT_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
 		[STATE_PRINT_MENU][EVENT_BUTTON_PRESSED] = empty_function,
-
 
 	};
 	/* USER CODE END SysInit */
@@ -114,16 +112,23 @@ int main(void) {
 	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
 	ST7789_Init();
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 
-
-
-
 	while (1) {
-		transition_table[state][event]();
+		//transition_table[state][event]();
+		switch (state) {
+		case STATE_PRINT_FREQ:
+			print_freq_hanler();
+			break;
+		case STATE_PRINT_MENU:
+			print_menu_hanler();
+			break;
+		}
+
 	}
 
 	/* USER CODE END WHILE */
@@ -170,8 +175,6 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
-
-
 
 /* USER CODE END 4 */
 
