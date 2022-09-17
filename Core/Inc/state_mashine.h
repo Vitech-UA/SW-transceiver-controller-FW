@@ -6,8 +6,7 @@
 void empty_function(void);
 void print_freq_hanler(void);
 void print_menu_hanler(void);
-void menu_up_hanler(void);
-void menu_down_hanler(void);
+
 typedef enum {
 	STATE_PRINT_FREQ,
 	STATE_SET_STEP,

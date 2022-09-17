@@ -8,8 +8,10 @@
 #ifndef MENU_H_
 #define MENU_H_
 #define MENU_ITEMS_CNT 4 // Кть пунктів основного меню.
+#define N_ELEMENTS(X) (sizeof(X)/sizeof(*(X))) // Макрос визначення к-ті елементів у масиві
 
-
-void draw_menu(void);
 void select_menu_item(uint8_t item);
+void unselect_menu_item(uint8_t item);
+void draw_menu(void);
+
 #endif /* MENU_H_ */

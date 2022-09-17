@@ -35,6 +35,7 @@ extern "C" {
 #include "si5351.h"
 #include "menu.h"
 #include "stdbool.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

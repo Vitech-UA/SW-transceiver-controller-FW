@@ -43,6 +43,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
+volatile uint8_t cw_flag;
+volatile uint8_t ccw_flag;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -194,6 +196,7 @@ void SysTick_Handler(void) {
 
 void EXTI1_IRQHandler(void) {
 	event = EVENT_BUTTON_PRESSED;
+
 	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
 
 }
@@ -205,7 +208,7 @@ void EXTI9_5_IRQHandler(void) {
 	if (!HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)) {
 		// Сюди потрапляємо, коли енкодер крутитим проти часової
 		event = EVENT_ENC_COUNTERCLOCK;
-		//counterclockwise_flag = 1;
+		ccw_flag = 1;
 	}
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
 
@@ -218,7 +221,7 @@ void EXTI15_10_IRQHandler(void) {
 
 	if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
 		event = EVENT_ENC_CLOCK;
-		//clockwise_flag = 1;
+		cw_flag = 1;
 		// Сюди потрапляємо, коли енкодер крутитим за часовою
 	}
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);

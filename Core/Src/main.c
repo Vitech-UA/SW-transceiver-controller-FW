@@ -47,11 +47,9 @@
 
 /* USER CODE BEGIN PV */
 
-bool clockwise_flag = 0;
-bool counterclockwise_flag = 0;
+
 uint8_t enc_btn_pressed_flag = 0;
 extern char menu_items;
-int menu_item_index = 0;
 uint8_t menu_is_drawed_flag = 0;
 extern STATE_t state;
 extern EVENT_t event;
@@ -98,12 +96,13 @@ int main(void) {
 	SystemClock_Config();
 
 	/* USER CODE BEGIN SysInit */
-	void (*const transition_table[5][5])(void) = {
+	void (*const transition_table[7][4])(void) = {
 		[STATE_PRINT_FREQ][EVENT_NONE] = print_freq_hanler,
 		[STATE_PRINT_FREQ][EVENT_BUTTON_PRESSED] = print_menu_hanler,
-		[STATE_PRINT_MENU][EVENT_NONE] = empty_function,
+		[STATE_PRINT_MENU][EVENT_NONE] = print_menu_hanler,
 		[STATE_PRINT_MENU][EVENT_ENC_CLOCK] = empty_function,
 		[STATE_PRINT_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
+		[STATE_PRINT_MENU][EVENT_BUTTON_PRESSED] = empty_function,
 
 
 	};
@@ -119,6 +118,9 @@ int main(void) {
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
+
+
+
 
 	while (1) {
 		transition_table[state][event]();
@@ -169,33 +171,7 @@ void SystemClock_Config(void) {
 
 /* USER CODE BEGIN 4 */
 
-void state_select_menu_item(void) {
 
-	if (!menu_is_drawed_flag) {
-		draw_menu();
-		menu_is_drawed_flag = 1;
-	}
-
-	if (counterclockwise_flag) {
-		menu_item_index++;
-		if (menu_item_index >= MENU_ITEMS_CNT - 1)
-			menu_item_index = MENU_ITEMS_CNT - 1;
-
-		select_menu_item(menu_item_index);
-		counterclockwise_flag = 0;
-		clockwise_flag = 0;
-	}
-	if (clockwise_flag) {
-		menu_item_index--;
-		if (menu_item_index <= 0)
-			menu_item_index = 0;
-
-		select_menu_item(menu_item_index);
-		counterclockwise_flag = 0;
-		clockwise_flag = 0;
-	}
-
-}
 
 /* USER CODE END 4 */
 
