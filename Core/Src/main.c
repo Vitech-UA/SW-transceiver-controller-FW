@@ -107,7 +107,7 @@ int main(void) {
 
 	/* USER CODE END 2 */
 	//init_menu();
-    //draw_menu_p(main_menu_items);
+	//draw_menu_p(main_menu_items);
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 
@@ -118,6 +118,9 @@ int main(void) {
 			break;
 		case STATE_PRINT_COMPONENT_TESTER_MENU:
 			print_component_tester_menu_hanler();
+			break;
+		case STATE_PRINT_GENERATOR_MENU:
+			print_generator_menu_hanler();
 			break;
 		}
 

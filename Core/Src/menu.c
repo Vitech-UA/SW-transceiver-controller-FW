@@ -21,9 +21,12 @@ char main_menu_items[][20] = { "Generator", "Component tester",
 /*Список пунктів меню тестера компонентів*/
 char component_tester_menu_items[][20] = { "..", "IGBT/MOSFET", "Triac",
 		"Optocoupler", "Inductor", "Zenner", "Supressor" };
+/*Список пунктів меню енератора*/
+char generator_menu_items[][20] = { "..", "Start generation", "Stop generation",
+		"Settings" };
 
 enum menu_type {
-	MAIN_MENU = 0, COMPONENT_TESTER_MENU,
+	MAIN_MENU = 0, COMPONENT_TESTER_MENU, GENERATOR_MENU
 };
 
 uint8_t menu_items_count = 0;
@@ -98,6 +101,17 @@ void draw_menu(uint8_t menu_type) {
 					component_tester_menu_items[i], Font_11x18, RED, BLACK);
 		}
 		break;
+	case GENERATOR_MENU:
+			menu_items_count = N_ELEMENTS(generator_menu_items) - 1;
+
+			//Друк пунктів меню  массиву
+			for (uint8_t i = 0; i <= menu_items_count; i++) {
+
+				ST7789_WriteString(start_y,
+						(start_x += vertical_space) - vertical_space,
+						generator_menu_items[i], Font_11x18, RED, BLACK);
+			}
+			break;
 	}
 
 }
