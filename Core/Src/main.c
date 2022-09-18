@@ -48,7 +48,7 @@
 /* USER CODE BEGIN PV */
 
 uint8_t enc_btn_pressed_flag = 0;
-extern char menu_items;
+extern char main_menu_items;
 uint8_t menu_is_drawed_flag = 0;
 extern STATE_t state;
 extern EVENT_t event;
@@ -95,15 +95,7 @@ int main(void) {
 	SystemClock_Config();
 
 	/* USER CODE BEGIN SysInit */
-	void (*const transition_table[4][4])(void) = {
-		[STATE_PRINT_FREQ][EVENT_NONE] = print_freq_hanler,
-		[STATE_PRINT_FREQ][EVENT_BUTTON_PRESSED] = print_menu_hanler,
-		[STATE_PRINT_MENU][EVENT_NONE] = print_menu_hanler,
-		[STATE_PRINT_MENU][EVENT_ENC_CLOCK] = empty_function,
-		[STATE_PRINT_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
-		[STATE_PRINT_MENU][EVENT_BUTTON_PRESSED] = empty_function,
 
-	};
 	/* USER CODE END SysInit */
 
 	/* Initialize all configured peripherals */
@@ -114,18 +106,18 @@ int main(void) {
 	ST7789_Init();
 
 	/* USER CODE END 2 */
-
+	//init_menu();
+    //draw_menu_p(main_menu_items);
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 
 	while (1) {
-		//transition_table[state][event]();
 		switch (state) {
-		case STATE_PRINT_FREQ:
-			print_freq_hanler();
+		case STATE_PRINT_MAIN_MENU:
+			print_main_menu_hanler();
 			break;
-		case STATE_PRINT_MENU:
-			print_menu_hanler();
+		case STATE_PRINT_COMPONENT_TESTER_MENU:
+			print_component_tester_menu_hanler();
 			break;
 		}
 

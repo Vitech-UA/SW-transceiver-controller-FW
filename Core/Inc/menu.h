@@ -11,6 +11,8 @@
 
 void select_menu_item(uint8_t item);
 void unselect_menu_item(uint8_t item);
-void draw_menu(void);
+void draw_menu(uint8_t menu_type);
+void draw_menu_p(char** data);
+void init_menu(void);
 
 #endif /* MENU_H_ */

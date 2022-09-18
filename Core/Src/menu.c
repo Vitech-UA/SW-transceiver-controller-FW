@@ -8,10 +8,33 @@
 #include "main.h"
 #include "state_mashine.h"
 
-char menu_items[][20] = { "..", "Step", "Intermediate", "Info", "RC-Test","Optocoupler-Test", "Zenner-Test", "L-Test" };
+typedef struct {
+	const char **items;
+
+} menu_item_t;
+
+menu_item_t main_menu;
+
+/*Список пунктів головного меню.*/
+char main_menu_items[][20] = { "Generator", "Component tester",
+		"Frequency meter", "Filter responce", "About UCT" };
+/*Список пунктів меню тестера компонентів*/
+char component_tester_menu_items[][20] = { "..", "IGBT/MOSFET", "Triac",
+		"Optocoupler", "Inductor", "Zenner", "Supressor" };
+
+enum menu_type {
+	MAIN_MENU = 0, COMPONENT_TESTER_MENU,
+};
+
 uint8_t menu_items_count = 0;
 extern STATE_t state;
 extern EVENT_t event;
+
+void init_menu(void) {
+	main_menu.items = (const char*[] ) { "Item1", "Item2" };
+	uint8_t size = N_ELEMENTS(&main_menu.items);
+}
+
 void select_menu_item(uint8_t item) {
 	uint8_t current_position = item;
 	const uint8_t x1_pos = 0;
@@ -29,19 +52,52 @@ void unselect_menu_item(uint8_t item) {
 	ST7789_DrawRectangle(x1_pos, 0 + (item * step_y_px), x2_pos,
 			30 + (item * step_y_px), BLACK);
 }
-void draw_menu(void) {
-	reset_event();
+void draw_menu_p(char **data) {
+
 	uint8_t start_x = 10; // Відступ від верхнього краю екрану
 	uint8_t start_y = 10; // Відступ від лівого краю екрану
 	uint8_t vertical_space = 30;
-	menu_items_count = N_ELEMENTS(menu_items) - 1;
 	ST7789_Fill_Color(BLACK);
+
+	menu_items_count = N_ELEMENTS(&data) - 1;
 	//Друк пунктів меню  массиву
-	for (uint8_t i = 0; i <= menu_items_count; i++) {
+	for (uint8_t i = 0; i <= 4; i++) {
 
 		ST7789_WriteString(start_y,
-				(start_x += vertical_space) - vertical_space, menu_items[i],
+				(start_x += vertical_space) - vertical_space, &data[i],
 				Font_11x18, RED, BLACK);
+
+	}
+
+}
+void draw_menu(uint8_t menu_type) {
+
+	uint8_t start_x = 10; // Відступ від верхнього краю екрану
+	uint8_t start_y = 10; // Відступ від лівого краю екрану
+	uint8_t vertical_space = 30;
+	ST7789_Fill_Color(BLACK);
+	switch (menu_type) {
+	case MAIN_MENU:
+		menu_items_count = N_ELEMENTS(main_menu_items) - 1;
+		//Друк пунктів меню  массиву
+		for (uint8_t i = 0; i <= menu_items_count; i++) {
+
+			ST7789_WriteString(start_y,
+					(start_x += vertical_space) - vertical_space,
+					main_menu_items[i], Font_11x18, RED, BLACK);
+		}
+		break;
+	case COMPONENT_TESTER_MENU:
+		menu_items_count = N_ELEMENTS(component_tester_menu_items) - 1;
+
+		//Друк пунктів меню  массиву
+		for (uint8_t i = 0; i <= menu_items_count; i++) {
+
+			ST7789_WriteString(start_y,
+					(start_x += vertical_space) - vertical_space,
+					component_tester_menu_items[i], Font_11x18, RED, BLACK);
+		}
+		break;
 	}
 
 }
