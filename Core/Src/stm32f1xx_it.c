@@ -54,6 +54,7 @@
 /* USER CODE BEGIN 0 */
 extern STATE_t state;
 extern EVENT_t event;
+extern ENCODER_STATE_t encoder_flag;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -193,6 +194,7 @@ void SysTick_Handler(void) {
  */
 void EXTI1_IRQHandler(void) {
 	/* USER CODE BEGIN EXTI1_IRQn 0 */
+	encoder_flag = ENCODER_BTN_PRESSED;
 	event = EVENT_BUTTON_PRESSED;
 	/* USER CODE END EXTI1_IRQn 0 */
 	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
@@ -208,6 +210,7 @@ void EXTI9_5_IRQHandler(void) {
 	/* USER CODE BEGIN EXTI9_5_IRQn 0 */
 	if (!HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)) {
 		// Сюди потрапляємо, коли енкодер крутитим проти часової
+		encoder_flag = ENCODER_COUNTERCLOCK;
 		event = EVENT_ENC_COUNTERCLOCK;
 
 	}
@@ -225,7 +228,7 @@ void EXTI15_10_IRQHandler(void) {
 	/* USER CODE BEGIN EXTI15_10_IRQn 0 */
 	if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
 		event = EVENT_ENC_CLOCK;
-
+		encoder_flag = ENCODER_CLOCK;
 		// Сюди потрапляємо, коли енкодер крутитим за часовою
 	}
 	/* USER CODE END EXTI15_10_IRQn 0 */

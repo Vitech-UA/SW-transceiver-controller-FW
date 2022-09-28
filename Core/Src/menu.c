@@ -8,12 +8,8 @@
 #include "main.h"
 #include "state_mashine.h"
 
-typedef struct {
-	const char **items;
 
-} menu_item_t;
 
-menu_item_t main_menu;
 
 /*Список пунктів головного меню.*/
 char main_menu_items[][20] = { "Generator", "Component tester",
@@ -33,10 +29,7 @@ uint8_t menu_items_count = 0;
 extern STATE_t state;
 extern EVENT_t event;
 
-void init_menu(void) {
-	main_menu.items = (const char*[] ) { "Item1", "Item2" };
-	uint8_t size = N_ELEMENTS(&main_menu.items);
-}
+
 
 void select_menu_item(uint8_t item) {
 	uint8_t current_position = item;

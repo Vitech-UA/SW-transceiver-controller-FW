@@ -47,11 +47,10 @@
 
 /* USER CODE BEGIN PV */
 
-uint8_t enc_btn_pressed_flag = 0;
-extern char main_menu_items;
-uint8_t menu_is_drawed_flag = 0;
-extern STATE_t state;
-extern EVENT_t event;
+
+extern volatile STATE_t state;
+extern volatile EVENT_t event;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,18 +58,24 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos);
 
-void state_set_intermediate(void);
-void state_set_frequency_step(void);
-void state_select_menu_item(void);
-void state_print_info(void);
-void state_increase_freq(void);
-void state_reduse_freq(void);
-void EmptyFunc(void);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void (*const transition_table[4][4])(void)= {
+	[STATE_PRINT_MAIN_MENU][EVENT_NONE] = print_main_menu_hanler,
+	[STATE_PRINT_MAIN_MENU][EVENT_BUTTON_PRESSED] = empty_function,
+	[STATE_PRINT_MAIN_MENU][EVENT_ENC_CLOCK] = empty_function,
+	[STATE_PRINT_MAIN_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
+
+	[STATE_PRINT_GENERATOR_MENU][EVENT_ENC_CLOCK] = empty_function,
+	[STATE_PRINT_GENERATOR_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
+	[STATE_PRINT_GENERATOR_MENU][EVENT_NONE]= print_generator_menu_hanler,
+	[STATE_PRINT_GENERATOR_MENU][EVENT_BUTTON_PRESSED] = empty_function,
+
+
+};
 
 /* USER CODE END 0 */
 
@@ -105,24 +110,14 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	ST7789_Init();
 
+
 	/* USER CODE END 2 */
-	//init_menu();
-	//draw_menu_p(main_menu_items);
+
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 
 	while (1) {
-		switch (state) {
-		case STATE_PRINT_MAIN_MENU:
-			print_main_menu_hanler();
-			break;
-		case STATE_PRINT_COMPONENT_TESTER_MENU:
-			print_component_tester_menu_hanler();
-			break;
-		case STATE_PRINT_GENERATOR_MENU:
-			print_generator_menu_hanler();
-			break;
-		}
+		transition_table[state][event]();
 
 	}
 

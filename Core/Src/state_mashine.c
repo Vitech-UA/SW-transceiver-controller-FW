@@ -10,11 +10,12 @@
 
 STATE_t state = STATE_PRINT_MAIN_MENU;
 EVENT_t event = EVENT_NONE;
-
+ENCODER_STATE_t encoder_flag = ENCODER_NONE;
 extern uint8_t menu_items_count;
 volatile uint8_t current_menu_index = 2;
 
-void reset_event(void) {
+void reset_enc_rot_flag(void) {
+	encoder_flag = ENCODER_NONE;
 	event = EVENT_NONE;
 }
 
@@ -31,48 +32,46 @@ void print_main_menu_hanler(void) {
 		FILTER_RESPONCE,
 		ABOUT_UCT,
 	};
-	static uint8_t display_main_menu_flag = 0;
+
 	static int current_menu_item = 0;
 	static int prev_menu_item = 0;
-	if (!display_main_menu_flag) {
-		// Тут одноразово друкуємо меню.
-		reset_event();
-		draw_menu(0);
-		display_main_menu_flag = 1;
-	}
 
-	if (event == EVENT_ENC_CLOCK) {
-		prev_menu_item = current_menu_item;
-		unselect_menu_item(prev_menu_item);
-		current_menu_item++;
-		if (current_menu_item > menu_items_count) {
-			current_menu_item = menu_items_count;
+	reset_enc_rot_flag();
+	draw_menu(0);
+	select_menu_item(0);
+
+	while (state == STATE_PRINT_MAIN_MENU) {
+		if (encoder_flag == ENCODER_CLOCK) {
+			prev_menu_item = current_menu_item;
+			unselect_menu_item(prev_menu_item);
+			current_menu_item++;
+			if (current_menu_item > menu_items_count) {
+				current_menu_item = menu_items_count;
+			}
+			select_menu_item(current_menu_item); // Відміняю попереднє виділення
+			reset_enc_rot_flag();
+
 		}
-		select_menu_item(current_menu_item); // Відміняю попереднє виділення
-		reset_event();
+		if (encoder_flag == ENCODER_COUNTERCLOCK) {
+			prev_menu_item = current_menu_item;
+			unselect_menu_item(prev_menu_item); // Відміняю попереднє виділення
+			current_menu_item--;
+			if (current_menu_item < 0)
+				current_menu_item = 0;
 
-	}
-	if (event == EVENT_ENC_COUNTERCLOCK) {
-		prev_menu_item = current_menu_item;
-		unselect_menu_item(prev_menu_item); // Відміняю попереднє виділення
-		current_menu_item--;
-		if (current_menu_item < 0)
-			current_menu_item = 0;
+			select_menu_item(current_menu_item);
+			reset_enc_rot_flag();
 
-		select_menu_item(current_menu_item);
-		reset_event();
-
-	}
-	if ((current_menu_item == COMPONENT_TESTER)
-			&& event == EVENT_BUTTON_PRESSED) {
-		display_main_menu_flag = 0;
-		state = STATE_PRINT_COMPONENT_TESTER_MENU;
-	}
-	if ((current_menu_item == GENERATOR)
+		}
+		if ((current_menu_item == COMPONENT_TESTER)
 				&& event == EVENT_BUTTON_PRESSED) {
-			display_main_menu_flag = 0;
-			state = STATE_PRINT_GENERATOR_MENU;
+			state = STATE_PRINT_COMPONENT_TESTER_MENU;
 		}
+		if ((current_menu_item == GENERATOR) && encoder_flag == ENCODER_BTN_PRESSED) {
+			state = STATE_PRINT_GENERATOR_MENU;
+			reset_enc_rot_flag();
+		}
+	}
 }
 
 void print_component_tester_menu_hanler(void) {
@@ -86,8 +85,9 @@ void print_component_tester_menu_hanler(void) {
 	static int prev_menu_item = 0;
 	if (!display_comp_test_menu_flag) {
 		// Тут одноразово друкуємо меню.
-		reset_event();
+		reset_enc_rot_flag();
 		draw_menu(1);
+		select_menu_item(0);
 		display_comp_test_menu_flag = 1;
 	}
 
@@ -99,7 +99,7 @@ void print_component_tester_menu_hanler(void) {
 			current_menu_item = menu_items_count;
 		}
 		select_menu_item(current_menu_item); // Відміняю попереднє виділення
-		reset_event();
+		reset_enc_rot_flag();
 
 	}
 	if (event == EVENT_ENC_COUNTERCLOCK) {
@@ -110,7 +110,7 @@ void print_component_tester_menu_hanler(void) {
 			current_menu_item = 0;
 
 		select_menu_item(current_menu_item);
-		reset_event();
+		reset_enc_rot_flag();
 
 	}
 	if ((current_menu_item == Back) && event == EVENT_BUTTON_PRESSED) {
@@ -120,20 +120,22 @@ void print_component_tester_menu_hanler(void) {
 
 }
 void print_generator_menu_hanler(void) {
+
 	enum main_menu_selected {
-			Back = 0, START, STOP, SETTINGS,};
+		Back = 0, START, STOP, SETTINGS,
+	};
 
-		static uint8_t display_generator_menu_flag = 0;
-		static int current_menu_item = 0;
-		static int prev_menu_item = 0;
-		if (!display_generator_menu_flag) {
-			// Тут одноразово друкуємо меню.
-			reset_event();
-			draw_menu(2);
-			display_generator_menu_flag = 1;
-		}
+	static int current_menu_item = 0;
+	static int prev_menu_item = 0;
 
-		if (event == EVENT_ENC_CLOCK) {
+	state = STATE_PRINT_GENERATOR_MENU;
+	// Тут одноразово друкуємо меню.
+	reset_enc_rot_flag();
+	draw_menu(2);
+	select_menu_item(0);
+
+	while (state == STATE_PRINT_GENERATOR_MENU) {
+		if (encoder_flag == ENCODER_COUNTERCLOCK) {
 			prev_menu_item = current_menu_item;
 			unselect_menu_item(prev_menu_item);
 			current_menu_item++;
@@ -141,10 +143,10 @@ void print_generator_menu_hanler(void) {
 				current_menu_item = menu_items_count;
 			}
 			select_menu_item(current_menu_item); // Відміняю попереднє виділення
-			reset_event();
+			reset_enc_rot_flag();
 
 		}
-		if (event == EVENT_ENC_COUNTERCLOCK) {
+		if (encoder_flag == ENCODER_CLOCK) {
 			prev_menu_item = current_menu_item;
 			unselect_menu_item(prev_menu_item); // Відміняю попереднє виділення
 			current_menu_item--;
@@ -152,11 +154,13 @@ void print_generator_menu_hanler(void) {
 				current_menu_item = 0;
 
 			select_menu_item(current_menu_item);
-			reset_event();
+			reset_enc_rot_flag();
 
 		}
-		if ((current_menu_item == Back) && event == EVENT_BUTTON_PRESSED) {
+		if ((current_menu_item == Back)
+				&& encoder_flag == ENCODER_BTN_PRESSED) {
 			state = STATE_PRINT_MAIN_MENU;
-			display_generator_menu_flag = 0;
+			reset_enc_rot_flag();
 		}
+	}
 }
