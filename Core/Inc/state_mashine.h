@@ -9,10 +9,12 @@ void empty_function(void);
 void print_main_menu_hanler(void);
 void print_component_tester_menu_hanler(void);
 void print_generator_menu_hanler(void);
+void generate_freq_handler(void);
 void reset_enc_rot_flag(void);
 
 typedef enum {
 	STATE_PRINT_MAIN_MENU,
+	STATE_GENERATE_FREQ,
 	STATE_PRINT_COMPONENT_TESTER_MENU,
 	STATE_PRINT_GENERATOR_MENU,
 } STATE_t;

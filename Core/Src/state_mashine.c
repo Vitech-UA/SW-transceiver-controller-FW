@@ -67,7 +67,8 @@ void print_main_menu_hanler(void) {
 				&& event == EVENT_BUTTON_PRESSED) {
 			state = STATE_PRINT_COMPONENT_TESTER_MENU;
 		}
-		if ((current_menu_item == GENERATOR) && encoder_flag == ENCODER_BTN_PRESSED) {
+		if ((current_menu_item == GENERATOR)
+				&& encoder_flag == ENCODER_BTN_PRESSED) {
 			state = STATE_PRINT_GENERATOR_MENU;
 			reset_enc_rot_flag();
 		}
@@ -158,9 +159,31 @@ void print_generator_menu_hanler(void) {
 
 		}
 		if ((current_menu_item == Back)
+		//.. Повернення до головного меню.
 				&& encoder_flag == ENCODER_BTN_PRESSED) {
 			state = STATE_PRINT_MAIN_MENU;
 			reset_enc_rot_flag();
 		}
+		if ((current_menu_item == START)
+				&& encoder_flag == ENCODER_BTN_PRESSED) {
+
+			state = STATE_GENERATE_FREQ;
+			reset_enc_rot_flag();
+		}
+	}
+}
+
+void generate_freq_handler(void) {
+
+	ST7789_Fill_Color(BLACK);
+	ST7789_WriteString(40, 0, "8000000 Hz", Font_16x26, WHITE, BLACK);
+	while (state == STATE_GENERATE_FREQ) {
+
+		if (encoder_flag == ENCODER_BTN_PRESSED) {
+
+			state = STATE_PRINT_MAIN_MENU;
+			reset_enc_rot_flag();
+		}
+
 	}
 }

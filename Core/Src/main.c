@@ -74,6 +74,16 @@ void (*const transition_table[STATE_MAX][EVENT_MAX])(void)= {
 	[STATE_PRINT_GENERATOR_MENU][EVENT_NONE]= print_generator_menu_hanler,
 	[STATE_PRINT_GENERATOR_MENU][EVENT_BUTTON_PRESSED] = empty_function,
 
+	[STATE_GENERATE_FREQ][EVENT_NONE] = generate_freq_handler,
+	[STATE_GENERATE_FREQ][EVENT_BUTTON_PRESSED] = empty_function,
+	[STATE_GENERATE_FREQ][EVENT_ENC_CLOCK] = empty_function,
+	[STATE_GENERATE_FREQ][EVENT_ENC_COUNTERCLOCK] = empty_function,
+
+	[STATE_PRINT_COMPONENT_TESTER_MENU][EVENT_NONE] = print_component_tester_menu_hanler,
+	[STATE_PRINT_COMPONENT_TESTER_MENU][EVENT_BUTTON_PRESSED] = empty_function,
+	[STATE_PRINT_COMPONENT_TESTER_MENU][EVENT_ENC_CLOCK] = empty_function,
+	[STATE_PRINT_COMPONENT_TESTER_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
+
 
 };
 
