@@ -63,7 +63,7 @@ void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void (*const transition_table[4][4])(void)= {
+void (*const transition_table[STATE_MAX][EVENT_MAX])(void)= {
 	[STATE_PRINT_MAIN_MENU][EVENT_NONE] = print_main_menu_hanler,
 	[STATE_PRINT_MAIN_MENU][EVENT_BUTTON_PRESSED] = empty_function,
 	[STATE_PRINT_MAIN_MENU][EVENT_ENC_CLOCK] = empty_function,

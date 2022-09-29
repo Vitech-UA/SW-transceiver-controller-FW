@@ -1,6 +1,8 @@
 #ifndef __STATE_MASHINE_H
 #define __STATE_MASHINE_H
 
+#define STATE_MAX 20
+#define EVENT_MAX 4
 
 /*Прототипи ф-й обробників станів машини*/
 void empty_function(void);

@@ -135,7 +135,7 @@ void print_generator_menu_hanler(void) {
 	select_menu_item(0);
 
 	while (state == STATE_PRINT_GENERATOR_MENU) {
-		if (encoder_flag == ENCODER_COUNTERCLOCK) {
+		if (encoder_flag == ENCODER_CLOCK) {
 			prev_menu_item = current_menu_item;
 			unselect_menu_item(prev_menu_item);
 			current_menu_item++;
@@ -146,7 +146,7 @@ void print_generator_menu_hanler(void) {
 			reset_enc_rot_flag();
 
 		}
-		if (encoder_flag == ENCODER_CLOCK) {
+		if (encoder_flag == ENCODER_COUNTERCLOCK) {
 			prev_menu_item = current_menu_item;
 			unselect_menu_item(prev_menu_item); // Відміняю попереднє виділення
 			current_menu_item--;
