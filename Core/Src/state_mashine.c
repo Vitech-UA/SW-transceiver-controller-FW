@@ -176,12 +176,12 @@ void print_generator_menu_hanler(void) {
 void generate_freq_handler(void) {
 
 	ST7789_Fill_Color(BLACK);
-	ST7789_WriteString(40, 0, "8000000 Hz", Font_16x26, WHITE, BLACK);
+	ST7789_WriteString(40, 10, "8000000 Hz", Font_16x26, WHITE, BLACK);
 	while (state == STATE_GENERATE_FREQ) {
 
 		if (encoder_flag == ENCODER_BTN_PRESSED) {
 
-			state = STATE_PRINT_MAIN_MENU;
+			state = STATE_PRINT_GENERATOR_MENU;
 			reset_enc_rot_flag();
 		}
 
