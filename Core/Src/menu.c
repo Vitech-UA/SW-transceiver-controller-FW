@@ -8,9 +8,6 @@
 #include "main.h"
 #include "state_mashine.h"
 
-
-
-
 /*Список пунктів головного меню.*/
 char main_menu_items[][20] = { "Generator", "Component tester",
 		"Frequency meter", "Filter responce", "About UCT" };
@@ -28,8 +25,6 @@ enum menu_type {
 uint8_t menu_items_count = 0;
 extern STATE_t state;
 extern EVENT_t event;
-
-
 
 void select_menu_item(uint8_t item) {
 	uint8_t current_position = item;
@@ -95,17 +90,22 @@ void draw_menu(uint8_t menu_type) {
 		}
 		break;
 	case GENERATOR_MENU:
-			menu_items_count = N_ELEMENTS(generator_menu_items) - 1;
+		menu_items_count = N_ELEMENTS(generator_menu_items) - 1;
 
-			//Друк пунктів меню  массиву
-			for (uint8_t i = 0; i <= menu_items_count; i++) {
+		//Друк пунктів меню  массиву
+		for (uint8_t i = 0; i <= menu_items_count; i++) {
 
-				ST7789_WriteString(start_y,
-						(start_x += vertical_space) - vertical_space,
-						generator_menu_items[i], Font_11x18, RED, BLACK);
-			}
-			break;
+			ST7789_WriteString(start_y,
+					(start_x += vertical_space) - vertical_space,
+					generator_menu_items[i], Font_11x18, RED, BLACK);
+		}
+		break;
 	}
 
 }
 
+void print_freq(uint32_t freq) {
+	char LCD_BUFFER[LCD_BUFFER_LENGTH];
+	sprintf((char*)LCD_BUFFER, "%8d Hz", freq);
+	ST7789_WriteString(30, 10, LCD_BUFFER, Font_16x26, WHITE, BLACK);
+}

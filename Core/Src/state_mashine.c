@@ -175,13 +175,44 @@ void print_generator_menu_hanler(void) {
 
 void generate_freq_handler(void) {
 
+	uint32_t freq_buffer = 8000000;
+	uint32_t freq_step = 100000;
+	int16_t correction = 0;
 	ST7789_Fill_Color(BLACK);
-	ST7789_WriteString(40, 10, "8000000 Hz", Font_16x26, WHITE, BLACK);
+	print_freq(freq_buffer);
+
+	// Зпуск генератора чаcтоти
+	si5351_Init(correction);
+	si5351_SetupCLK0(freq_buffer, SI5351_DRIVE_STRENGTH_8MA);
+	si5351_EnableOutputs(1 << 0);
+
 	while (state == STATE_GENERATE_FREQ) {
+
+		if (encoder_flag == ENCODER_COUNTERCLOCK) {
+			if (freq_buffer >= SI5351_MAX_FREQ) {
+				freq_buffer = SI5351_MAX_FREQ;
+			} else {
+				freq_buffer += freq_step;
+			}
+			si5351_SetupCLK0(freq_buffer, SI5351_DRIVE_STRENGTH_8MA);
+			print_freq(freq_buffer);
+			reset_enc_rot_flag();
+		}
+		if (encoder_flag == ENCODER_CLOCK) {
+			if (freq_buffer <= SI5351_MIN_FREQ) {
+				freq_buffer = SI5351_MIN_FREQ;
+			} else {
+				freq_buffer -= freq_step;
+			}
+			si5351_SetupCLK0(freq_buffer, SI5351_DRIVE_STRENGTH_8MA);
+			print_freq(freq_buffer);
+			reset_enc_rot_flag();
+		}
 
 		if (encoder_flag == ENCODER_BTN_PRESSED) {
 
 			state = STATE_PRINT_GENERATOR_MENU;
+			si5351_EnableOutputs(0 << 0);
 			reset_enc_rot_flag();
 		}
 
