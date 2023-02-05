@@ -31,9 +31,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "st7789.h"
+
 #include "si5351.h"
-#include "menu.h"
 #include "stdbool.h"
 
 /* USER CODE END Includes */
@@ -65,7 +64,6 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOC
 #define ENC_BTN_Pin GPIO_PIN_1
 #define ENC_BTN_GPIO_Port GPIOA
-#define ENC_BTN_EXTI_IRQn EXTI1_IRQn
 #define LCD_DC_Pin GPIO_PIN_0
 #define LCD_DC_GPIO_Port GPIOB
 #define LCD_RS_Pin GPIO_PIN_1
