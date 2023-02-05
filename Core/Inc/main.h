@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -31,9 +31,6 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
-#include "si5351.h"
-#include "stdbool.h"
 
 /* USER CODE END Includes */
 
@@ -62,12 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
-#define ENC_BTN_Pin GPIO_PIN_1
-#define ENC_BTN_GPIO_Port GPIOA
-#define LCD_DC_Pin GPIO_PIN_0
-#define LCD_DC_GPIO_Port GPIOB
-#define LCD_RS_Pin GPIO_PIN_1
-#define LCD_RS_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
