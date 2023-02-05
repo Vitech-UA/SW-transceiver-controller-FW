@@ -147,11 +147,28 @@ int main(void) {
 	sw_bands.band_10m.min_freq = 28000000;
 	sw_bands.band_10m.band_code = 0b0001;
 
+	I2C_ScanBus();
+	const int32_t correction = 978;
+	si5351_Init(correction);
+
+	si5351PLLConfig_t pll_conf;
+	si5351OutputConfig_t out_conf;
+	int32_t Fclk = sw_bands.band_160m.max_freq; // 7 MHz
+
+	si5351_Calc(Fclk, &pll_conf, &out_conf);
+	si5351_SetupPLL(SI5351_PLL_A, &pll_conf);
+
+	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_8MA, &out_conf,
+			0);
+	si5351_EnableOutputs(1 << 0);
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_Delay(200);
 
 		/* USER CODE END WHILE */
 
