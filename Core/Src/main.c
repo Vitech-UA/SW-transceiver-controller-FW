@@ -6,7 +6,7 @@
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2022 STMicroelectronics.
+ * Copyright (c) 2023 STMicroelectronics.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -18,14 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "i2c.h"
-#include "spi.h"
-#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
-#include "state_mashine.h"
+#include "si5351.h"
+#include "stdbool.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,7 +32,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,32 +40,40 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
 
 /* USER CODE BEGIN PV */
+typedef struct {
+	uint32_t max_freq;
+	uint32_t min_freq;
+	uint8_t store_address;
+	uint8_t band_code;
 
-bool clockwise_flag = 0;
-bool counterclockwise_flag = 0;
-uint8_t enc_btn_pressed_flag = 0;
-extern char menu_items;
-int menu_item_index = 0;
-uint8_t menu_is_drawed_flag = 0;
-extern STATE_t state;
-extern EVENT_t event;
+} band_data_t;
+
+typedef struct band {
+	band_data_t band_160m;
+	band_data_t band_80m;
+	band_data_t band_40m;
+	band_data_t band_30m;
+	band_data_t band_20m;
+	band_data_t band_17m;
+	band_data_t band_15m;
+	band_data_t band_12m;
+	band_data_t band_10m;
+
+} band_t;
+
+band_t sw_bands;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
-void dds_print_freq(uint32_t freq, uint8_t x_pos, uint8_t y_pos);
-
-void state_set_intermediate(void);
-void state_set_frequency_step(void);
-void state_select_menu_item(void);
-void state_print_info(void);
-void state_increase_freq(void);
-void state_reduse_freq(void);
-void EmptyFunc(void);
-
+void I2C_ScanBus(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -83,6 +87,7 @@ void EmptyFunc(void);
  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
+
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -98,36 +103,60 @@ int main(void) {
 	SystemClock_Config();
 
 	/* USER CODE BEGIN SysInit */
-	void (*const transition_table[5][5])(void) = {
-		[STATE_PRINT_FREQ][EVENT_NONE] = print_freq_hanler,
-		[STATE_PRINT_FREQ][EVENT_BUTTON_PRESSED] = print_menu_hanler,
-		[STATE_PRINT_MENU][EVENT_NONE] = empty_function,
-		[STATE_PRINT_MENU][EVENT_ENC_CLOCK] = empty_function,
-		[STATE_PRINT_MENU][EVENT_ENC_COUNTERCLOCK] = empty_function,
 
-
-	};
 	/* USER CODE END SysInit */
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	MX_I2C1_Init();
-	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
-	ST7789_Init();
+
+	sw_bands.band_160m.max_freq = 2000000;
+	sw_bands.band_160m.min_freq = 1810000;
+	sw_bands.band_160m.band_code = 0b0000;
+
+	sw_bands.band_80m.max_freq = 3800000;
+	sw_bands.band_80m.min_freq = 3500000;
+	sw_bands.band_80m.band_code = 0b1000;
+
+	sw_bands.band_40m.max_freq = 7200000;
+	sw_bands.band_40m.min_freq = 7000000;
+	sw_bands.band_40m.band_code = 0b0100;
+
+	sw_bands.band_30m.max_freq = 10150000;
+	sw_bands.band_30m.min_freq = 10100000;
+	sw_bands.band_30m.band_code = 0b1100;
+
+	sw_bands.band_20m.max_freq = 14350000;
+	sw_bands.band_20m.min_freq = 14000000;
+	sw_bands.band_20m.band_code = 0b0010;
+
+	sw_bands.band_17m.max_freq = 18380000;
+	sw_bands.band_17m.min_freq = 18006888;
+	sw_bands.band_17m.band_code = 0b1010;
+
+	sw_bands.band_15m.max_freq = 21450000;
+	sw_bands.band_15m.min_freq = 21000000;
+	sw_bands.band_15m.band_code = 0b0110;
+
+	sw_bands.band_12m.max_freq = 25140000;
+	sw_bands.band_12m.min_freq = 24890000;
+	sw_bands.band_12m.band_code = 0b1110;
+
+	sw_bands.band_10m.max_freq = 29700000;
+	sw_bands.band_10m.min_freq = 28000000;
+	sw_bands.band_10m.band_code = 0b0001;
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-
 	while (1) {
-		transition_table[state][event]();
+
+		/* USER CODE END WHILE */
+
+		/* USER CODE BEGIN 3 */
 	}
-
-	/* USER CODE END WHILE */
-
-	/* USER CODE BEGIN 3 */
-
 	/* USER CODE END 3 */
 }
 
@@ -167,36 +196,83 @@ void SystemClock_Config(void) {
 	}
 }
 
-/* USER CODE BEGIN 4 */
+/**
+ * @brief I2C1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_I2C1_Init(void) {
 
-void state_select_menu_item(void) {
+	/* USER CODE BEGIN I2C1_Init 0 */
 
-	if (!menu_is_drawed_flag) {
-		draw_menu();
-		menu_is_drawed_flag = 1;
+	/* USER CODE END I2C1_Init 0 */
+
+	/* USER CODE BEGIN I2C1_Init 1 */
+
+	/* USER CODE END I2C1_Init 1 */
+	hi2c1.Instance = I2C1;
+	hi2c1.Init.ClockSpeed = 100000;
+	hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+	hi2c1.Init.OwnAddress1 = 0;
+	hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+	hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	hi2c1.Init.OwnAddress2 = 0;
+	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+	if (HAL_I2C_Init(&hi2c1) != HAL_OK) {
+		Error_Handler();
 	}
+	/* USER CODE BEGIN I2C1_Init 2 */
 
-	if (counterclockwise_flag) {
-		menu_item_index++;
-		if (menu_item_index >= MENU_ITEMS_CNT - 1)
-			menu_item_index = MENU_ITEMS_CNT - 1;
-
-		select_menu_item(menu_item_index);
-		counterclockwise_flag = 0;
-		clockwise_flag = 0;
-	}
-	if (clockwise_flag) {
-		menu_item_index--;
-		if (menu_item_index <= 0)
-			menu_item_index = 0;
-
-		select_menu_item(menu_item_index);
-		counterclockwise_flag = 0;
-		clockwise_flag = 0;
-	}
+	/* USER CODE END I2C1_Init 2 */
 
 }
 
+/**
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void) {
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin : LED_Pin */
+	GPIO_InitStruct.Pin = LED_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+
+}
+
+/* USER CODE BEGIN 4 */
+void I2C_ScanBus(void) {
+	uint8_t i = 0;
+	char UART_BUFFER[20] = { };
+	bool search_result = false;
+	/* Scan only for 112 allowed addresses */
+	for (i = 0x07; i < 0x78; i++) {
+		if (HAL_I2C_IsDeviceReady(&hi2c1, i << 1, 10, 100) == HAL_OK) {
+			search_result = true;
+			sprintf(UART_BUFFER, "Find: 0x%02X\r\n", i << 1);
+
+		}
+
+	}
+	if (!search_result) {
+		sprintf(UART_BUFFER, "Devices not found\r\n");
+
+	}
+}
 /* USER CODE END 4 */
 
 /**

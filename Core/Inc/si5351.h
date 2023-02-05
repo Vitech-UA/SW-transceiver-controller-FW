@@ -4,6 +4,8 @@
 #define _SI5351_H_
 
 #include "stdint.h"
+#define SI5351_MIN_FREQ 8000
+#define SI5351_MAX_FREQ 160000000
 typedef enum {
     SI5351_PLL_A = 0,
     SI5351_PLL_B,
