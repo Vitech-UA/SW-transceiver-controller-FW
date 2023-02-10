@@ -1,4 +1,4 @@
-#include "Control_module.h"
+#include <max7219.h>
 
 uint8_t aTxBuf[1] = { 0 };
 #define SPI_ITEM hspi1
