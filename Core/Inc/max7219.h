@@ -4,7 +4,7 @@
 #include "stm32f1xx_hal.h"
 #include "main.h"
 #include "math.h"
-
+void MAX7219_init(void);
 void MAX7219_write_register (uint8_t rg, uint8_t dt);
 void MAX7219_clear (void);
 void MAX7219_print_int(volatile uint32_t number);

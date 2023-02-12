@@ -17,8 +17,8 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <max7219.h>
 #include "main.h"
+#include "dma.h"
 #include "i2c.h"
 #include "spi.h"
 #include "usart.h"
@@ -29,9 +29,9 @@
 #include "si5351.h"
 #include "stdbool.h"
 #include "band.h"
+#include "command_handler.h"
 #include <string.h>
 #include <stdio.h>
-#include "UartRingbuffer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,6 +94,7 @@ int main(void) {
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
+	MX_DMA_Init();
 	MX_I2C1_Init();
 	MX_SPI1_Init();
 	MX_USART1_UART_Init();
@@ -104,8 +105,7 @@ int main(void) {
 	const int32_t correction = 978;
 	si5351_Init(correction);
 	MAX7219_init();
-	Ringbuf_init();
-
+	HAL_UART_Receive_DMA(&huart1, con.in.rs232.buf, RS232_INPUT_BUF_SIZE);
 	dds_set_freq(sw_bands.band_10m.min_freq);
 
 	/* USER CODE END 2 */
@@ -113,34 +113,14 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		if (IsDataAvailable()) {
+		CommandHandler();
+		/* USER CODE END WHILE */
 
-			{
-				char str[UART_BUFFER_SIZE] = { 0, };
-				uint8_t i = 0;
-
-				while (IsDataAvailable()) {
-					str[i++] = Uart_read(); // читаем байт
-
-					if (i == UART_BUFFER_SIZE - 1) {
-						str[i] = '\0';
-						break;
-					}
-
-					//HAL_Delay(1);
-				}
-
-				str[i] = '\0';
-
-				HAL_UART_Transmit(&huart1, (uint8_t*) str, strlen(str), 100);
-			}
-			/* USER CODE END WHILE */
-
-			/* USER CODE BEGIN 3 */
-		}
-		/* USER CODE END 3 */
+		/* USER CODE BEGIN 3 */
 	}
+	/* USER CODE END 3 */
 }
+
 /**
  * @brief System Clock Configuration
  * @retval None
