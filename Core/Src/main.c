@@ -104,7 +104,7 @@ int main(void) {
 	const int32_t correction = 0;
 	si5351_Init(correction);
 	MAX7219_init();
-	dds_set_freq(sw_bands.band_80m.min_freq);
+	dds_set_freq(sw_bands.band_80m.max_freq);
 
 	/* USER CODE END 2 */
 
