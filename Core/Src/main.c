@@ -29,7 +29,6 @@
 #include "si5351.h"
 #include "stdbool.h"
 #include "band.h"
-#include "command_handler.h"
 #include <string.h>
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -102,18 +101,16 @@ int main(void) {
 	//System Init
 	i2c_check_devices();
 	init_bands();
-	const int32_t correction = 978;
+	const int32_t correction = 0;
 	si5351_Init(correction);
 	MAX7219_init();
-	HAL_UART_Receive_DMA(&huart1, con.in.rs232.buf, RS232_INPUT_BUF_SIZE);
-	dds_set_freq(sw_bands.band_10m.min_freq);
+	dds_set_freq(sw_bands.band_80m.min_freq);
 
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		CommandHandler();
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
