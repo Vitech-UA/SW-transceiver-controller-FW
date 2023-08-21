@@ -59,6 +59,9 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
+#define ENC_BTN_Pin GPIO_PIN_14
+#define ENC_BTN_GPIO_Port GPIOC
+#define ENC_BTN_EXTI_IRQn EXTI15_10_IRQn
 #define MAX7219_NCS_Pin GPIO_PIN_6
 #define MAX7219_NCS_GPIO_Port GPIOA
 
