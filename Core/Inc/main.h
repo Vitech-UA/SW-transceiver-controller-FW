@@ -64,15 +64,12 @@ void Error_Handler(void);
 #define ENC_BTN_EXTI_IRQn EXTI15_10_IRQn
 #define MAX7219_NCS_Pin GPIO_PIN_6
 #define MAX7219_NCS_GPIO_Port GPIOA
-#define band_20m_Pin GPIO_PIN_12
-#define band_20m_GPIO_Port GPIOB
-#define band_20m_EXTI_IRQn EXTI15_10_IRQn
-#define band_40m_Pin GPIO_PIN_13
-#define band_40m_GPIO_Port GPIOB
-#define band_40m_EXTI_IRQn EXTI15_10_IRQn
-#define band_80m_Pin GPIO_PIN_15
-#define band_80m_GPIO_Port GPIOB
-#define band_80m_EXTI_IRQn EXTI15_10_IRQn
+#define Band_20m_Pin GPIO_PIN_12
+#define Band_20m_GPIO_Port GPIOB
+#define Band_40m_Pin GPIO_PIN_13
+#define Band_40m_GPIO_Port GPIOB
+#define Band_80m_Pin GPIO_PIN_15
+#define Band_80m_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

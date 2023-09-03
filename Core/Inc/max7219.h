@@ -1,5 +1,5 @@
-#ifndef CONTROL_MODULE_H_
-#define CONTROL_MODULE_H_
+#ifndef MAX7219_H_
+#define MAX7219_H_
 
 #include "stm32f1xx_hal.h"
 #include "main.h"
@@ -14,4 +14,4 @@ void MAX7219_set_brightness(uint8_t Intensity);
 void MAX7219_print_char(uint8_t position, uint8_t symbol);
 void MAX7219_init (void);
 
-#endif /* CONTROL_MODULE_H_ */
+#endif /* MAX7219_H_ */

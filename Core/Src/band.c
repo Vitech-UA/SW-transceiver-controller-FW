@@ -6,17 +6,18 @@
  */
 #include "band.h"
 #include "stdint.h"
-
-
+#include "main.h"
 
 band_t sw_bands;
+extern UART_HandleTypeDef huart2;
+extern char UART_BUFFER[40];
+
+static const Handler_t cmd_tbl[] = { { "Band_20m", band_20m_pre_handler,
+		band_20m_handler, band_20m_post_handler },
+
+};
 
 void init_bands(void) {
-
-	sw_bands.band_160m.max_freq = 2000000;
-	sw_bands.band_160m.min_freq = 1810000;
-	sw_bands.band_160m.band_code = 0b0000;
-
 	sw_bands.band_80m.max_freq = 3800000;
 	sw_bands.band_80m.min_freq = 3500000;
 	sw_bands.band_80m.band_code = 0b1000;
@@ -25,27 +26,32 @@ void init_bands(void) {
 	sw_bands.band_40m.min_freq = 7000000;
 	sw_bands.band_40m.band_code = 0b0100;
 
-	sw_bands.band_30m.max_freq = 10150000;
-	sw_bands.band_30m.min_freq = 10100000;
-	sw_bands.band_30m.band_code = 0b1100;
-
 	sw_bands.band_20m.max_freq = 14350000;
 	sw_bands.band_20m.min_freq = 14000000;
 	sw_bands.band_20m.band_code = 0b0010;
 
-	sw_bands.band_17m.max_freq = 18380000;
-	sw_bands.band_17m.min_freq = 18006888;
-	sw_bands.band_17m.band_code = 0b1010;
+}
 
-	sw_bands.band_15m.max_freq = 21450000;
-	sw_bands.band_15m.min_freq = 21000000;
-	sw_bands.band_15m.band_code = 0b0110;
+void band_process(void) {
+	cmd_tbl[0].pre_handler();
+	cmd_tbl[0].handler();
+	cmd_tbl[0].post_handler();
+}
 
-	sw_bands.band_12m.max_freq = 25140000;
-	sw_bands.band_12m.min_freq = 24890000;
-	sw_bands.band_12m.band_code = 0b1110;
+void band_20m_pre_handler(void) {
+	sprintf(UART_BUFFER, "20m_pre_handler\r\n");
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
+}
 
-	sw_bands.band_10m.max_freq = 29700000;
-	sw_bands.band_10m.min_freq = 28000000;
-	sw_bands.band_10m.band_code = 0b0001;
+void band_20m_post_handler(void) {
+	sprintf(UART_BUFFER, "20m_post_handler\r\n");
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
+}
+
+void band_20m_handler(void) {
+	sprintf(UART_BUFFER, "20m_handler\r\n");
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
 }

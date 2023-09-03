@@ -65,9 +65,10 @@ void dds_set_freq(uint32_t freq);
 /* USER CODE BEGIN 0 */
 char UART_BUFFER[40] = { };
 uint8_t btn_pressed_flag = 0;
-uint8_t active_20m_bang_flag = 0;
-uint8_t active_40m_bang_flag = 0;
-uint8_t active_80m_bang_flag = 0;
+uint8_t active_20m_band_flag = 0;
+uint8_t active_40m_band_flag = 0;
+uint8_t active_80m_band_flag = 0;
+uint8_t idle_band_flag = 0;
 /* USER CODE END 0 */
 
 /**
@@ -101,6 +102,7 @@ int main(void) {
 	MX_SPI1_Init();
 	MX_TIM1_Init();
 	MX_USART2_UART_Init();
+	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
 	//System Init
 	i2c_check_devices();
@@ -110,20 +112,22 @@ int main(void) {
 	MAX7219_init();
 	dds_set_freq(sw_bands.band_80m.max_freq);
 	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+	HAL_TIM_Base_Start_IT(&htim2);
 	int32_t prevCounter = 0;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+
+        band_process();
+
 		int32_t currCounter = __HAL_TIM_GET_COUNTER(&htim1);
 		currCounter = 32767 - ((currCounter - 1) & 0xFFFF);
 
 		if (currCounter != prevCounter) {
 			int32_t delta = currCounter - prevCounter;
 			prevCounter = currCounter;
-			// защита от дребезга контактов и переполнения счетчика
-			// (переполнение будет случаться очень редко)
 			if ((delta > -10) && (delta < 10)) {
 				if (delta < 0) {
 					sprintf(UART_BUFFER, "Rotate right\r\n");
@@ -182,32 +186,7 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == GPIO_PIN_14) {
-		sprintf(UART_BUFFER, "Button\r\n");
-		HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-		HAL_MAX_DELAY);
 
-	}
-	if (GPIO_Pin == band_20m_Pin) {
-		sprintf(UART_BUFFER, "Band 20m set\r\n");
-		HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-				HAL_MAX_DELAY);
-
-	}
-	if (GPIO_Pin == band_40m_Pin) {
-		sprintf(UART_BUFFER, "Band 40m set\r\n");
-		HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-		HAL_MAX_DELAY);
-
-	}
-	if (GPIO_Pin == band_80m_Pin) {
-		sprintf(UART_BUFFER, "Band 80m set\r\n");
-		HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-		HAL_MAX_DELAY);
-
-	}
-}
 void dds_set_freq(uint32_t freq) {
 	MAX7219_print_int(freq);
 	si5351PLLConfig_t pll_conf;

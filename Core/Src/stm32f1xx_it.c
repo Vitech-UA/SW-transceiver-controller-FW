@@ -27,6 +27,10 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 extern uint8_t btn_pressed_flag;
+extern uint8_t active_20m_band_flag;
+extern uint8_t active_40m_band_flag;
+extern uint8_t active_80m_band_flag;
+extern uint8_t idle_band_flag;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -56,7 +60,7 @@ extern void Uart_isr(UART_HandleTypeDef *huart);
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-
+extern TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -199,16 +203,54 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles TIM2 global interrupt.
+  */
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+	if (HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin) == GPIO_PIN_RESET
+			&& HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin)
+					== GPIO_PIN_SET) {
+		active_80m_band_flag = 1;
+	}
+	if (HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin) == GPIO_PIN_RESET
+			&& HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin)
+					== GPIO_PIN_SET) {
+		active_40m_band_flag = 1;
+	}
+	if (HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin) == GPIO_PIN_RESET
+			&& HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin)
+					== GPIO_PIN_SET) {
+		active_20m_band_flag = 1;
+	}
+	if (HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin) == GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin)
+					== GPIO_PIN_SET) {
+		idle_band_flag = 1;
+	}
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
   * @brief This function handles EXTI line[15:10] interrupts.
   */
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
   /* USER CODE END EXTI15_10_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(band_20m_Pin);
-  HAL_GPIO_EXTI_IRQHandler(band_40m_Pin);
   HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
-  HAL_GPIO_EXTI_IRQHandler(band_80m_Pin);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
   /* USER CODE END EXTI15_10_IRQn 1 */
