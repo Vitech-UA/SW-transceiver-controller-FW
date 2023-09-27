@@ -77,7 +77,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(MAX7219_NCS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = Band_20m_Pin|Band_40m_Pin|Band_80m_Pin;
+  GPIO_InitStruct.Pin = Band_80m_Pin|Band_40m_Pin|Band_20m_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
