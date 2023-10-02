@@ -9,6 +9,7 @@
 #include "main.h"
 #include "string.h"
 #include "stdio.h"
+#include "tim.h"
 
 extern UART_HandleTypeDef huart2;
 extern char UART_BUFFER[40];
@@ -24,6 +25,7 @@ band_data_t band_40m;
 band_data_t band_20m;
 uint8_t current_band;
 uint8_t prev_band;
+uint32_t prevCounter = 0;
 
 enum {
 	BAND_20M = 0, BAND_40M, BAND_80M,
@@ -70,10 +72,26 @@ void post_handler(band_data_t current_band) {
 }
 
 void handler(band_data_t current_band) {
-	sprintf(UART_BUFFER, "handler: %s\r\n", current_band.band_name);
-	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-			100);
-	HAL_Delay(500);
+	int32_t currCounter = __HAL_TIM_GET_COUNTER(&htim1);
+	currCounter = 32767 - ((currCounter - 1) & 0xFFFF);
+
+	if (currCounter != prevCounter) {
+		int32_t delta = currCounter - prevCounter;
+		prevCounter = currCounter;
+		if ((delta > -10) && (delta < 10)) {
+			if (delta < 0) {
+				sprintf(UART_BUFFER, "Rotate right. Handler: %s\r\n", current_band.band_name);
+				HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER,
+						strlen(UART_BUFFER), 100);
+				/* Обробляємо код коли енкодер крутиться вправо */
+			} else {
+				sprintf(UART_BUFFER, "Rotate left. Handler: %s\r\n", current_band.band_name);
+				HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER,
+						strlen(UART_BUFFER), 100);
+				/* Обробляємо код коли енкодер крутиться вліво */
+			}
+		}
+	}
 }
 
 void reset_band_flags(void) {
@@ -122,16 +140,13 @@ void band_process(void) {
 }
 int get_current_band() {
 	if (active_20m_band_flag == 1) {
-		reset_band_flags();
 		return BAND_20M;
 	}
 
 	if (active_40m_band_flag == 1) {
-		reset_band_flags();
 		return BAND_40M;
 	}
 	if (active_80m_band_flag == 1) {
-		reset_band_flags();
 		return BAND_80M;
 	}
 

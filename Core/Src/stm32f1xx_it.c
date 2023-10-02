@@ -69,130 +69,117 @@ extern TIM_HandleTypeDef htim2;
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
-  * @brief This function handles Non maskable interrupt.
-  */
-void NMI_Handler(void)
-{
-  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+ * @brief This function handles Non maskable interrupt.
+ */
+void NMI_Handler(void) {
+	/* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
-  /* USER CODE END NonMaskableInt_IRQn 0 */
-  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+	/* USER CODE END NonMaskableInt_IRQn 0 */
+	/* USER CODE BEGIN NonMaskableInt_IRQn 1 */
 	while (1) {
 	}
-  /* USER CODE END NonMaskableInt_IRQn 1 */
+	/* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
-  * @brief This function handles Hard fault interrupt.
-  */
-void HardFault_Handler(void)
-{
-  /* USER CODE BEGIN HardFault_IRQn 0 */
+ * @brief This function handles Hard fault interrupt.
+ */
+void HardFault_Handler(void) {
+	/* USER CODE BEGIN HardFault_IRQn 0 */
 
-  /* USER CODE END HardFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-    /* USER CODE END W1_HardFault_IRQn 0 */
-  }
+	/* USER CODE END HardFault_IRQn 0 */
+	while (1) {
+		/* USER CODE BEGIN W1_HardFault_IRQn 0 */
+		/* USER CODE END W1_HardFault_IRQn 0 */
+	}
 }
 
 /**
-  * @brief This function handles Memory management fault.
-  */
-void MemManage_Handler(void)
-{
-  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+ * @brief This function handles Memory management fault.
+ */
+void MemManage_Handler(void) {
+	/* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
-  /* USER CODE END MemoryManagement_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
-    /* USER CODE END W1_MemoryManagement_IRQn 0 */
-  }
+	/* USER CODE END MemoryManagement_IRQn 0 */
+	while (1) {
+		/* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+		/* USER CODE END W1_MemoryManagement_IRQn 0 */
+	}
 }
 
 /**
-  * @brief This function handles Prefetch fault, memory access fault.
-  */
-void BusFault_Handler(void)
-{
-  /* USER CODE BEGIN BusFault_IRQn 0 */
+ * @brief This function handles Prefetch fault, memory access fault.
+ */
+void BusFault_Handler(void) {
+	/* USER CODE BEGIN BusFault_IRQn 0 */
 
-  /* USER CODE END BusFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
-    /* USER CODE END W1_BusFault_IRQn 0 */
-  }
+	/* USER CODE END BusFault_IRQn 0 */
+	while (1) {
+		/* USER CODE BEGIN W1_BusFault_IRQn 0 */
+		/* USER CODE END W1_BusFault_IRQn 0 */
+	}
 }
 
 /**
-  * @brief This function handles Undefined instruction or illegal state.
-  */
-void UsageFault_Handler(void)
-{
-  /* USER CODE BEGIN UsageFault_IRQn 0 */
+ * @brief This function handles Undefined instruction or illegal state.
+ */
+void UsageFault_Handler(void) {
+	/* USER CODE BEGIN UsageFault_IRQn 0 */
 
-  /* USER CODE END UsageFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
-    /* USER CODE END W1_UsageFault_IRQn 0 */
-  }
+	/* USER CODE END UsageFault_IRQn 0 */
+	while (1) {
+		/* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+		/* USER CODE END W1_UsageFault_IRQn 0 */
+	}
 }
 
 /**
-  * @brief This function handles System service call via SWI instruction.
-  */
-void SVC_Handler(void)
-{
-  /* USER CODE BEGIN SVCall_IRQn 0 */
+ * @brief This function handles System service call via SWI instruction.
+ */
+void SVC_Handler(void) {
+	/* USER CODE BEGIN SVCall_IRQn 0 */
 
-  /* USER CODE END SVCall_IRQn 0 */
-  /* USER CODE BEGIN SVCall_IRQn 1 */
+	/* USER CODE END SVCall_IRQn 0 */
+	/* USER CODE BEGIN SVCall_IRQn 1 */
 
-  /* USER CODE END SVCall_IRQn 1 */
+	/* USER CODE END SVCall_IRQn 1 */
 }
 
 /**
-  * @brief This function handles Debug monitor.
-  */
-void DebugMon_Handler(void)
-{
-  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
+ * @brief This function handles Debug monitor.
+ */
+void DebugMon_Handler(void) {
+	/* USER CODE BEGIN DebugMonitor_IRQn 0 */
 
-  /* USER CODE END DebugMonitor_IRQn 0 */
-  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+	/* USER CODE END DebugMonitor_IRQn 0 */
+	/* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
-  /* USER CODE END DebugMonitor_IRQn 1 */
+	/* USER CODE END DebugMonitor_IRQn 1 */
 }
 
 /**
-  * @brief This function handles Pendable request for system service.
-  */
-void PendSV_Handler(void)
-{
-  /* USER CODE BEGIN PendSV_IRQn 0 */
+ * @brief This function handles Pendable request for system service.
+ */
+void PendSV_Handler(void) {
+	/* USER CODE BEGIN PendSV_IRQn 0 */
 
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
+	/* USER CODE END PendSV_IRQn 0 */
+	/* USER CODE BEGIN PendSV_IRQn 1 */
 
-  /* USER CODE END PendSV_IRQn 1 */
+	/* USER CODE END PendSV_IRQn 1 */
 }
 
 /**
-  * @brief This function handles System tick timer.
-  */
-void SysTick_Handler(void)
-{
-  /* USER CODE BEGIN SysTick_IRQn 0 */
+ * @brief This function handles System tick timer.
+ */
+void SysTick_Handler(void) {
+	/* USER CODE BEGIN SysTick_IRQn 0 */
 
-  /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
-  /* USER CODE BEGIN SysTick_IRQn 1 */
+	/* USER CODE END SysTick_IRQn 0 */
+	HAL_IncTick();
+	/* USER CODE BEGIN SysTick_IRQn 1 */
 
-  /* USER CODE END SysTick_IRQn 1 */
+	/* USER CODE END SysTick_IRQn 1 */
 }
 
 /******************************************************************************/
@@ -203,17 +190,19 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles TIM2 global interrupt.
-  */
-void TIM2_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM2_IRQn 0 */
+ * @brief This function handles TIM2 global interrupt.
+ */
+void TIM2_IRQHandler(void) {
+	/* USER CODE BEGIN TIM2_IRQn 0 */
 	if (HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin) == GPIO_PIN_RESET
 			&& HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin)
 					== GPIO_PIN_SET
 			&& HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin)
 					== GPIO_PIN_SET) {
 		active_80m_band_flag = 1;
+		active_20m_band_flag = 0;
+		active_40m_band_flag = 0;
+
 	}
 	if (HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin) == GPIO_PIN_RESET
 			&& HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin)
@@ -221,6 +210,8 @@ void TIM2_IRQHandler(void)
 			&& HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin)
 					== GPIO_PIN_SET) {
 		active_40m_band_flag = 1;
+		active_20m_band_flag = 0;
+		active_80m_band_flag = 0;
 	}
 	if (HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin) == GPIO_PIN_RESET
 			&& HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin)
@@ -228,6 +219,8 @@ void TIM2_IRQHandler(void)
 			&& HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin)
 					== GPIO_PIN_SET) {
 		active_20m_band_flag = 1;
+		active_40m_band_flag = 0;
+		active_80m_band_flag = 0;
 	}
 	if (HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin) == GPIO_PIN_SET
 			&& HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin)
@@ -236,24 +229,23 @@ void TIM2_IRQHandler(void)
 					== GPIO_PIN_SET) {
 		idle_band_flag = 1;
 	}
-  /* USER CODE END TIM2_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim2);
-  /* USER CODE BEGIN TIM2_IRQn 1 */
+	/* USER CODE END TIM2_IRQn 0 */
+	HAL_TIM_IRQHandler(&htim2);
+	/* USER CODE BEGIN TIM2_IRQn 1 */
 
-  /* USER CODE END TIM2_IRQn 1 */
+	/* USER CODE END TIM2_IRQn 1 */
 }
 
 /**
-  * @brief This function handles EXTI line[15:10] interrupts.
-  */
-void EXTI15_10_IRQHandler(void)
-{
-  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-  /* USER CODE END EXTI15_10_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
-  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+ * @brief This function handles EXTI line[15:10] interrupts.
+ */
+void EXTI15_10_IRQHandler(void) {
+	/* USER CODE BEGIN EXTI15_10_IRQn 0 */
+	/* USER CODE END EXTI15_10_IRQn 0 */
+	HAL_GPIO_EXTI_IRQHandler(ENC_BTN_Pin);
+	/* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
-  /* USER CODE END EXTI15_10_IRQn 1 */
+	/* USER CODE END EXTI15_10_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
