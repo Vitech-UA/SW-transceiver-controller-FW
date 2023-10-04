@@ -26,12 +26,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "si5351.h"
-#include "stdbool.h"
 #include "band.h"
 #include <string.h>
 #include <stdio.h>
-#include "max7219.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,7 +57,7 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void i2c_check_devices(void);
-void dds_set_freq(uint32_t freq);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -160,17 +158,7 @@ void SystemClock_Config(void) {
 
 /* USER CODE BEGIN 4 */
 
-void dds_set_freq(uint32_t freq) {
-	MAX7219_print_int(freq);
-	si5351PLLConfig_t pll_conf;
-	si5351OutputConfig_t out_conf;
-	si5351_Calc(freq, &pll_conf, &out_conf);
-	si5351_SetupPLL(SI5351_PLL_A, &pll_conf);
-	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_8MA, &out_conf,
-			0);
-	si5351_EnableOutputs(1 << 0);
 
-}
 void i2c_check_devices(void) {
 	if (HAL_I2C_IsDeviceReady(&hi2c1, EEPRON_I2C_ADDRESS, 10, 100) == HAL_OK) {
 		sprintf(UART_BUFFER, "Find 24C256: 0x%02X\r\n", EEPRON_I2C_ADDRESS);

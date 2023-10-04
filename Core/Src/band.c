@@ -10,7 +10,8 @@
 #include "string.h"
 #include "stdio.h"
 #include "tim.h"
-
+#include "si5351.h"
+#include "max7219.h"
 extern UART_HandleTypeDef huart2;
 extern char UART_BUFFER[40];
 
@@ -26,9 +27,11 @@ band_data_t band_20m;
 uint8_t current_band;
 uint8_t prev_band;
 uint32_t prevCounter = 0;
+uint32_t freq = 0;
+uint32_t freq_change_step = 1000;
 
 enum {
-	BAND_20M = 0, BAND_40M, BAND_80M,
+	BAND_20M = 0, BAND_40M, BAND_80M, IDLE,
 };
 
 void init_bands(void) {
@@ -40,6 +43,7 @@ void init_bands(void) {
 	band_80m.handler = handler;
 	band_80m.post_handler = post_handler;
 	band_80m.band_name = "80m (3.65 MHz)";
+	band_80m.current_freq = 3650000;
 
 	band_40m.max_freq = 7200000;
 	band_40m.min_freq = 7000000;
@@ -48,6 +52,7 @@ void init_bands(void) {
 	band_40m.handler = handler;
 	band_40m.post_handler = post_handler;
 	band_40m.band_name = "40m (7.1 MHz)";
+	band_40m.current_freq = 7100000;
 
 	band_20m.max_freq = 14350000;
 	band_20m.min_freq = 14000000;
@@ -56,13 +61,13 @@ void init_bands(void) {
 	band_20m.handler = handler;
 	band_20m.post_handler = post_handler;
 	band_20m.band_name = "20m (14.175 MHz)";
+	band_20m.current_freq = 14750000;
 
 }
 
 void pre_handler(band_data_t current_band) {
-	sprintf(UART_BUFFER, "pre_handler: %s\r\n", current_band.band_name);
-	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-			100);
+	freq = get_current_freq_from_eeprom(current_band);
+	dds_set_freq(freq);
 }
 
 void post_handler(band_data_t current_band) {
@@ -71,23 +76,39 @@ void post_handler(band_data_t current_band) {
 			100);
 }
 
+void save_current_freq_to_eeprom(band_data_t current_band) {
+
+}
+
+uint32_t get_current_freq_from_eeprom(band_data_t current_band) {
+	return current_band.current_freq;
+}
+
 void handler(band_data_t current_band) {
 	int32_t currCounter = __HAL_TIM_GET_COUNTER(&htim1);
 	currCounter = 32767 - ((currCounter - 1) & 0xFFFF);
+	print_freq(freq);
 
 	if (currCounter != prevCounter) {
 		int32_t delta = currCounter - prevCounter;
 		prevCounter = currCounter;
 		if ((delta > -10) && (delta < 10)) {
 			if (delta < 0) {
-				sprintf(UART_BUFFER, "Rotate right. Handler: %s\r\n", current_band.band_name);
-				HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER,
-						strlen(UART_BUFFER), 100);
+
+				if (freq >= current_band.max_freq) {
+					freq = current_band.max_freq;
+				} else {
+					freq += freq_change_step;
+				}
+				dds_set_freq(freq);
 				/* Обробляємо код коли енкодер крутиться вправо */
 			} else {
-				sprintf(UART_BUFFER, "Rotate left. Handler: %s\r\n", current_band.band_name);
-				HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER,
-						strlen(UART_BUFFER), 100);
+				if (freq < current_band.min_freq) {
+					freq = current_band.min_freq;
+				} else {
+					freq -= freq_change_step;
+				}
+				dds_set_freq(freq);
 				/* Обробляємо код коли енкодер крутиться вліво */
 			}
 		}
@@ -149,5 +170,21 @@ int get_current_band() {
 	if (active_80m_band_flag == 1) {
 		return BAND_80M;
 	}
+	return IDLE;
+}
+
+void dds_set_freq(uint32_t freq) {
+	si5351PLLConfig_t pll_conf;
+	si5351OutputConfig_t out_conf;
+	si5351_Calc(freq, &pll_conf, &out_conf);
+	si5351_SetupPLL(SI5351_PLL_A, &pll_conf);
+	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_8MA, &out_conf,
+			0);
+	si5351_EnableOutputs(1 << 0);
+
+}
+
+void print_freq(uint32_t freq) {
+	MAX7219_print_int(freq);
 
 }
