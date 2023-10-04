@@ -24,8 +24,8 @@ uint8_t idle_band_flag = 0;
 band_data_t band_80m;
 band_data_t band_40m;
 band_data_t band_20m;
-uint8_t current_band;
-uint8_t prev_band;
+band_data_t current_band;
+band_data_t prev_band;
 uint32_t prevCounter = 0;
 uint32_t freq = 0;
 uint32_t freq_change_step = 1000;
@@ -44,6 +44,7 @@ void init_bands(void) {
 	band_80m.post_handler = post_handler;
 	band_80m.band_name = "80m (3.65 MHz)";
 	band_80m.current_freq = 3650000;
+	band_80m.index = BAND_80M;
 
 	band_40m.max_freq = 7200000;
 	band_40m.min_freq = 7000000;
@@ -53,6 +54,7 @@ void init_bands(void) {
 	band_40m.post_handler = post_handler;
 	band_40m.band_name = "40m (7.1 MHz)";
 	band_40m.current_freq = 7100000;
+	band_40m.index = BAND_40M;
 
 	band_20m.max_freq = 14350000;
 	band_20m.min_freq = 14000000;
@@ -62,6 +64,7 @@ void init_bands(void) {
 	band_20m.post_handler = post_handler;
 	band_20m.band_name = "20m (14.175 MHz)";
 	band_20m.current_freq = 14750000;
+	band_20m.index = BAND_20M;
 
 }
 
@@ -101,7 +104,6 @@ void handler(band_data_t current_band) {
 					freq += freq_change_step;
 				}
 				dds_set_freq(freq);
-				/* Обробляємо код коли енкодер крутиться вправо */
 			} else {
 				if (freq < current_band.min_freq) {
 					freq = current_band.min_freq;
@@ -109,7 +111,6 @@ void handler(band_data_t current_band) {
 					freq -= freq_change_step;
 				}
 				dds_set_freq(freq);
-				/* Обробляємо код коли енкодер крутиться вліво */
 			}
 		}
 	}
@@ -123,54 +124,29 @@ void reset_band_flags(void) {
 }
 
 void band_process(void) {
-
 	current_band = get_current_band();
 	prev_band = current_band;
+	current_band.pre_handler(current_band);
+	while (prev_band.index == current_band.index) {
+		current_band.handler(current_band);
+		current_band = get_current_band();
+	}
+	current_band.post_handler(current_band);
 
-	switch (current_band) {
-	case BAND_20M: {
-		band_20m.pre_handler(band_20m);
-		while (prev_band == current_band) {
-			band_20m.handler(band_20m);
-			current_band = get_current_band();
-		}
-		band_20m.post_handler(band_20m);
-		break;
-	}
-	case BAND_40M: {
-		band_40m.pre_handler(band_40m);
-		while (prev_band == current_band) {
-			band_40m.handler(band_40m);
-			current_band = get_current_band();
-		}
-		band_40m.post_handler(band_40m);
-		break;
-
-	}
-	case BAND_80M: {
-		band_80m.pre_handler(band_80m);
-		while (prev_band == current_band) {
-			band_80m.handler(band_80m);
-			current_band = get_current_band();
-		}
-		band_80m.post_handler(band_80m);
-		break;
-
-	}
-	}
 }
-int get_current_band() {
+band_data_t get_current_band() {
+	band_data_t band_to_return;
 	if (active_20m_band_flag == 1) {
-		return BAND_20M;
+		band_to_return = band_20m;
 	}
 
 	if (active_40m_band_flag == 1) {
-		return BAND_40M;
+		band_to_return = band_40m;
 	}
 	if (active_80m_band_flag == 1) {
-		return BAND_80M;
+		band_to_return = band_80m;
 	}
-	return IDLE;
+	return band_to_return;
 }
 
 void dds_set_freq(uint32_t freq) {

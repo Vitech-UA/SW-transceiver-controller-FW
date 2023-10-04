@@ -18,6 +18,7 @@ typedef struct {
 	uint32_t current_freq;
 	uint8_t band_code;
 	uint8_t store_address;
+	uint8_t index;
 	char* band_name;
 	// handlers
 	band_handler pre_handler;
@@ -35,7 +36,7 @@ typedef struct {
 
 void init_bands(void);
 void band_process(void);
-int get_current_band(void);
+band_data_t get_current_band(void);
 // band_general
 void pre_handler(band_data_t current_band);
 void post_handler(band_data_t current_band);
