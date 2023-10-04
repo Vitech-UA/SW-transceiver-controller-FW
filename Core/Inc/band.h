@@ -37,6 +37,7 @@ typedef struct {
 void init_bands(void);
 void band_process(void);
 band_data_t get_current_band(void);
+
 // band_general
 void pre_handler(band_data_t current_band);
 void post_handler(band_data_t current_band);

@@ -2,7 +2,7 @@
  * band.c
  *
  *  Created on: Feb 6, 2023
- *      Author: Viktor
+ *      Author: Viktor Starovit
  */
 #include "band.h"
 #include "stdint.h"
@@ -19,7 +19,6 @@ uint8_t btn_pressed_flag = 0;
 uint8_t active_20m_band_flag = 0;
 uint8_t active_40m_band_flag = 0;
 uint8_t active_80m_band_flag = 0;
-uint8_t idle_band_flag = 0;
 
 band_data_t band_80m;
 band_data_t band_40m;
@@ -31,7 +30,7 @@ uint32_t freq = 0;
 uint32_t freq_change_step = 1000;
 
 enum {
-	BAND_20M = 0, BAND_40M, BAND_80M, IDLE,
+	BAND_20M = 0, BAND_40M, BAND_80M,
 };
 
 void init_bands(void) {
@@ -63,7 +62,7 @@ void init_bands(void) {
 	band_20m.handler = handler;
 	band_20m.post_handler = post_handler;
 	band_20m.band_name = "20m (14.175 MHz)";
-	band_20m.current_freq = 14750000;
+	band_20m.current_freq = 14250000;
 	band_20m.index = BAND_20M;
 
 }
@@ -88,52 +87,49 @@ uint32_t get_current_freq_from_eeprom(band_data_t current_band) {
 }
 
 void handler(band_data_t current_band) {
-	int32_t currCounter = __HAL_TIM_GET_COUNTER(&htim1);
-	currCounter = 32767 - ((currCounter - 1) & 0xFFFF);
+
+	_encoder_process(current_band);
 	print_freq(freq);
 
+}
+
+void band_process(void) {
+
+	current_band = get_current_band();
+	prev_band = current_band;
+
+	current_band.pre_handler(current_band);
+
+	while (prev_band.index == current_band.index) {
+		current_band.handler(current_band);
+		current_band = get_current_band();
+	}
+
+	current_band.post_handler(current_band);
+
+}
+
+void _encoder_process(band_data_t current_band) {
+	int32_t currCounter = __HAL_TIM_GET_COUNTER(&htim1);
+	currCounter = 32767 - ((currCounter - 1) & 0xFFFF);
 	if (currCounter != prevCounter) {
 		int32_t delta = currCounter - prevCounter;
 		prevCounter = currCounter;
 		if ((delta > -10) && (delta < 10)) {
 			if (delta < 0) {
 
-				if (freq >= current_band.max_freq) {
-					freq = current_band.max_freq;
-				} else {
-					freq += freq_change_step;
-				}
+				freq = (freq >= current_band.max_freq) ?
+										current_band.max_freq : (freq += freq_change_step);
 				dds_set_freq(freq);
 			} else {
-				if (freq < current_band.min_freq) {
-					freq = current_band.min_freq;
-				} else {
-					freq -= freq_change_step;
-				}
-				dds_set_freq(freq);
+				freq = (freq <= current_band.min_freq) ?
+						current_band.min_freq : (freq -= freq_change_step);
 			}
+			dds_set_freq(freq);
 		}
 	}
 }
 
-void reset_band_flags(void) {
-	active_20m_band_flag = 0;
-	active_40m_band_flag = 0;
-	active_80m_band_flag = 0;
-	idle_band_flag = 0;
-}
-
-void band_process(void) {
-	current_band = get_current_band();
-	prev_band = current_band;
-	current_band.pre_handler(current_band);
-	while (prev_band.index == current_band.index) {
-		current_band.handler(current_band);
-		current_band = get_current_band();
-	}
-	current_band.post_handler(current_band);
-
-}
 band_data_t get_current_band() {
 	band_data_t band_to_return;
 	if (active_20m_band_flag == 1) {

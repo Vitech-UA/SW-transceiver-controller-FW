@@ -222,13 +222,6 @@ void TIM2_IRQHandler(void) {
 		active_40m_band_flag = 0;
 		active_80m_band_flag = 0;
 	}
-	if (HAL_GPIO_ReadPin(Band_20m_GPIO_Port, Band_20m_Pin) == GPIO_PIN_SET
-			&& HAL_GPIO_ReadPin(Band_80m_GPIO_Port, Band_80m_Pin)
-					== GPIO_PIN_SET
-			&& HAL_GPIO_ReadPin(Band_40m_GPIO_Port, Band_40m_Pin)
-					== GPIO_PIN_SET) {
-		idle_band_flag = 1;
-	}
 	/* USER CODE END TIM2_IRQn 0 */
 	HAL_TIM_IRQHandler(&htim2);
 	/* USER CODE BEGIN TIM2_IRQn 1 */
