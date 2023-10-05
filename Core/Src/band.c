@@ -12,6 +12,7 @@
 #include "tim.h"
 #include "si5351.h"
 #include "max7219.h"
+#include "EEPROM.h"
 extern UART_HandleTypeDef huart2;
 extern char UART_BUFFER[40];
 
@@ -19,6 +20,8 @@ uint8_t btn_pressed_flag = 0;
 uint8_t active_20m_band_flag = 0;
 uint8_t active_40m_band_flag = 0;
 uint8_t active_80m_band_flag = 0;
+
+extern I2C_HandleTypeDef hi2c1;
 
 band_data_t band_80m;
 band_data_t band_40m;
@@ -37,7 +40,6 @@ void init_bands(void) {
 	band_80m.max_freq = 3800000;
 	band_80m.min_freq = 3500000;
 	band_80m.band_code = 0b1000;
-	band_80m.handler = handler;
 	band_80m.pre_handler = pre_handler;
 	band_80m.handler = handler;
 	band_80m.post_handler = post_handler;
@@ -68,7 +70,7 @@ void init_bands(void) {
 }
 
 void pre_handler(band_data_t current_band) {
-	freq = get_current_freq_from_eeprom(current_band);
+	//freq = get_current_freq_from_eeprom(current_band);
 	dds_set_freq(freq);
 }
 
@@ -78,11 +80,30 @@ void post_handler(band_data_t current_band) {
 			100);
 }
 
-void save_current_freq_to_eeprom(band_data_t current_band) {
+void save_current_freq_to_eeprom(void) {
+
+	uint8_t data_to_save[4];
+	data_to_save[0] = 0x11;
+	data_to_save[1] = 0x22;
+	data_to_save[2] = 0x33;
+	data_to_save[3] = 0x44;
+	sprintf(UART_BUFFER, "Save to eeprom:\n0x%02X\n0x%02X\n0x%02X\n0x%02X\n",
+			data_to_save[0], data_to_save[1], data_to_save[2], data_to_save[2]);
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
+
+	EEPROM_Write(3, 10, data_to_save, 4);
 
 }
 
-uint32_t get_current_freq_from_eeprom(band_data_t current_band) {
+uint32_t get_current_freq_from_eeprom(void) {
+
+	uint8_t data_to_read[4];
+	EEPROM_Read(3, 10, data_to_read, 4);
+	sprintf(UART_BUFFER, "Read to eeprom:\n0x%02X\n0x%02X\n0x%02X\n0x%02X\n",
+			data_to_read[0], data_to_read[1], data_to_read[2], data_to_read[2]);
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
 	return current_band.current_freq;
 }
 
@@ -119,7 +140,7 @@ void _encoder_process(band_data_t current_band) {
 			if (delta < 0) {
 
 				freq = (freq >= current_band.max_freq) ?
-										current_band.max_freq : (freq += freq_change_step);
+						current_band.max_freq : (freq += freq_change_step);
 				dds_set_freq(freq);
 			} else {
 				freq = (freq <= current_band.min_freq) ?
@@ -158,5 +179,22 @@ void dds_set_freq(uint32_t freq) {
 
 void print_freq(uint32_t freq) {
 	MAX7219_print_int(freq);
+
+}
+
+void test_eeprom(void) {
+	uint8_t xBuffer[2];
+	xBuffer[0] = 'M'; //0x4D
+	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) EEPRON_I2C_ADDRESS,
+	MEMORY_ADDRESS, 1, xBuffer, 1, 5);
+	HAL_Delay(10);
+	xBuffer[0] = 0x00; //clear buffer
+	HAL_Delay(100);
+	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) EEPRON_I2C_ADDRESS, MEMORY_ADDRESS, 1,
+			xBuffer, 1, 5);
+
+	sprintf(UART_BUFFER, "Read from EEPROM: 0x%d\r\n", xBuffer[0]);
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
 
 }

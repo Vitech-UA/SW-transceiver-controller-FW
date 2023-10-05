@@ -10,6 +10,10 @@
 
 #include "stdint.h"
 
+#define EEPRON_I2C_ADDRESS 0xA0
+#define SI5351_I2C_ADDRESS 0xC0
+#define MEMORY_ADDRESS 0x08
+
 typedef void (*band_handler)(band_data_t);
 
 typedef struct {
@@ -43,7 +47,9 @@ void pre_handler(band_data_t current_band);
 void post_handler(band_data_t current_band);
 void handler(band_data_t current_band);
 //
-uint32_t get_current_freq_from_eeprom(band_data_t current_band);
+uint32_t get_current_freq_from_eeprom(void);
+void save_current_freq_to_eeprom(void);
 void dds_set_freq(uint32_t freq);
+void test_eeprom(void);
 void print_freq(uint32_t freq);
 #endif /* INC_BAND_H_ */

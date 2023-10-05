@@ -29,13 +29,12 @@
 #include "band.h"
 #include <string.h>
 #include <stdio.h>
-
+#include "EEPROM.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define EEPRON_I2C_ADDRESS 0xA0
-#define SI5351_I2C_ADDRESS 0xC0
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -106,13 +105,19 @@ int main(void) {
 	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	HAL_TIM_Base_Start_IT(&htim2);
 
+	save_current_freq_to_eeprom();
+	get_current_freq_from_eeprom();
+
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 
-		band_process();
+		//band_process();
+
+
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
