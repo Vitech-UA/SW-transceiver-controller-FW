@@ -63,6 +63,7 @@ void i2c_check_devices(void);
 /* USER CODE BEGIN 0 */
 char UART_BUFFER[40] = { };
 
+
 /* USER CODE END 0 */
 
 /**
@@ -105,6 +106,7 @@ int main(void)
 	MAX7219_init();
 	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	HAL_TIM_Base_Start_IT(&htim2);
+
 
 
   /* USER CODE END 2 */

@@ -48,7 +48,7 @@ void si5351_Init(int32_t correction);
 void si5351_SetupCLK0(int32_t Fclk, si5351DriveStrength_t driveStrength);
 void si5351_SetupCLK2(int32_t Fclk, si5351DriveStrength_t driveStrength);
 void si5351_EnableOutputs(uint8_t enabled);
-
+void si5351_set_freq(uint32_t freq);
 /*
  * Advanced interface. Use it if you need:
  *

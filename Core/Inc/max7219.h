@@ -12,6 +12,5 @@ void MAX7219_print_temperature(volatile uint32_t number);
 void MAX7219_print_float(float number);
 void MAX7219_set_brightness(uint8_t Intensity);
 void MAX7219_print_char(uint8_t position, uint8_t symbol);
-void MAX7219_init (void);
 
 #endif /* MAX7219_H_ */

@@ -364,3 +364,14 @@ void si5351_writeBulk(uint8_t baseaddr, int32_t P1, int32_t P2, int32_t P3, uint
     si5351_write(baseaddr+6, (P2 >> 8) & 0xFF);
     si5351_write(baseaddr+7, P2 & 0xFF);
 }
+
+void si5351_set_freq(uint32_t freq) {
+	si5351PLLConfig_t pll_conf;
+	si5351OutputConfig_t out_conf;
+	si5351_Calc(freq, &pll_conf, &out_conf);
+	si5351_SetupPLL(SI5351_PLL_A, &pll_conf);
+	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_8MA, &out_conf,
+			0);
+	si5351_EnableOutputs(1 << 0);
+
+}

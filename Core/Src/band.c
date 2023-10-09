@@ -44,7 +44,7 @@ void init_bands(void) {
 	band_80m.handler = handler;
 	band_80m.post_handler = post_handler;
 	band_80m.band_name = "80m (3.65 MHz)";
-	band_80m.current_freq = 3650000;
+	band_80m.current_freq = 0;
 	band_80m.index = BAND_80M;
 	band_80m.store_address = 0x00;
 
@@ -55,7 +55,7 @@ void init_bands(void) {
 	band_40m.handler = handler;
 	band_40m.post_handler = post_handler;
 	band_40m.band_name = "40m (7.1 MHz)";
-	band_40m.current_freq = 7100000;
+	band_40m.current_freq = 0;
 	band_40m.index = BAND_40M;
 	band_40m.store_address = 0x04;
 
@@ -66,9 +66,9 @@ void init_bands(void) {
 	band_20m.handler = handler;
 	band_20m.post_handler = post_handler;
 	band_20m.band_name = "20m (14.175 MHz)";
-	band_20m.current_freq = 14250000;
+	band_20m.current_freq = 0;
 	band_20m.index = BAND_20M;
-	band_20m.store_address = 0x10;
+	band_20m.store_address = 0x8;
 
 }
 
@@ -81,6 +81,7 @@ void pre_handler(band_data_t current_band) {
 
 void post_handler(band_data_t current_band) {
 	save_current_freq_to_eeprom(current_band);
+	current_band.current_freq = current_freq;
 }
 
 void save_current_freq_to_eeprom(band_data_t band_data) {
@@ -104,7 +105,6 @@ uint32_t get_current_freq_from_eeprom(uint16_t store_address) {
 void handler(band_data_t current_band) {
 
 	encoder_process(current_band);
-
 
 }
 
@@ -134,17 +134,23 @@ void encoder_process(band_data_t current_band) {
 		if ((delta > -10) && (delta < 10)) {
 			if (delta < 0) {
 
-				current_freq = (current_freq >= current_band.max_freq) ?
-						current_band.max_freq : (current_freq += freq_change_step);
-				dds_set_freq(current_freq);
-				print_freq(current_freq);
-			} else {
-				current_freq = (current_freq <= current_band.min_freq) ?
-						current_band.min_freq : (current_freq -= freq_change_step);
-				dds_set_freq(current_freq);
-				print_freq(current_freq);
-			}
+				if (current_freq >= current_band.max_freq) {
+					current_freq = current_band.max_freq;
+				} else {
+					current_freq += freq_change_step;
+				}
 
+			} else {
+				if (current_freq <= current_band.min_freq) {
+					current_freq = current_band.min_freq;
+				} else {
+					current_freq -= freq_change_step;
+				}
+
+			}
+			current_band.current_freq = current_freq;
+			dds_set_freq(current_freq);
+			print_freq(current_freq);
 		}
 	}
 }
@@ -165,13 +171,7 @@ band_data_t get_current_band() {
 }
 
 void dds_set_freq(uint32_t freq) {
-	si5351PLLConfig_t pll_conf;
-	si5351OutputConfig_t out_conf;
-	si5351_Calc(freq, &pll_conf, &out_conf);
-	si5351_SetupPLL(SI5351_PLL_A, &pll_conf);
-	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_8MA, &out_conf,
-			0);
-	si5351_EnableOutputs(1 << 0);
+	si5351_set_freq(freq);
 
 }
 
