@@ -41,14 +41,15 @@ typedef struct {
 void init_bands(void);
 void band_process(void);
 band_data_t get_current_band(void);
+void encoder_process(band_data_t current_band);
 
 // band_general
 void pre_handler(band_data_t current_band);
 void post_handler(band_data_t current_band);
 void handler(band_data_t current_band);
 //
-uint32_t get_current_freq_from_eeprom(void);
-void save_current_freq_to_eeprom(void);
+uint32_t get_current_freq_from_eeprom(uint16_t store_address);
+void save_current_freq_to_eeprom(band_data_t band_data);
 void dds_set_freq(uint32_t freq);
 void test_eeprom(void);
 void print_freq(uint32_t freq);

@@ -4,6 +4,7 @@
  *  Created on: Feb 6, 2023
  *      Author: Viktor Starovit
  */
+#include <AT24C256.h>
 #include "band.h"
 #include "stdint.h"
 #include "main.h"
@@ -12,7 +13,6 @@
 #include "tim.h"
 #include "si5351.h"
 #include "max7219.h"
-#include "EEPROM.h"
 extern UART_HandleTypeDef huart2;
 extern char UART_BUFFER[40];
 
@@ -29,7 +29,7 @@ band_data_t band_20m;
 band_data_t current_band;
 band_data_t prev_band;
 uint32_t prevCounter = 0;
-uint32_t freq = 0;
+volatile uint32_t current_freq = 0;
 uint32_t freq_change_step = 1000;
 
 enum {
@@ -46,6 +46,7 @@ void init_bands(void) {
 	band_80m.band_name = "80m (3.65 MHz)";
 	band_80m.current_freq = 3650000;
 	band_80m.index = BAND_80M;
+	band_80m.store_address = 0x00;
 
 	band_40m.max_freq = 7200000;
 	band_40m.min_freq = 7000000;
@@ -56,6 +57,7 @@ void init_bands(void) {
 	band_40m.band_name = "40m (7.1 MHz)";
 	band_40m.current_freq = 7100000;
 	band_40m.index = BAND_40M;
+	band_40m.store_address = 0x04;
 
 	band_20m.max_freq = 14350000;
 	band_20m.min_freq = 14000000;
@@ -66,55 +68,43 @@ void init_bands(void) {
 	band_20m.band_name = "20m (14.175 MHz)";
 	band_20m.current_freq = 14250000;
 	band_20m.index = BAND_20M;
+	band_20m.store_address = 0x10;
 
 }
 
 void pre_handler(band_data_t current_band) {
-	uint32_t freq = get_current_freq_from_eeprom();
-	dds_set_freq(freq);
-	print_freq(freq);
-	sprintf(UART_BUFFER, "pre_handler: %s\r\n", current_band.band_name);
-		HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-				100);
+	current_freq = get_current_freq_from_eeprom(current_band.store_address);
+	dds_set_freq(current_freq);
+	print_freq(current_freq);
+
 }
 
 void post_handler(band_data_t current_band) {
-	sprintf(UART_BUFFER, "post_handler: %s\r\n", current_band.band_name);
-	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-			100);
+	save_current_freq_to_eeprom(current_band);
 }
 
-void save_current_freq_to_eeprom(void) {
-
-	uint8_t data_to_save[4];
-	data_to_save[0] = 0x11;
-	data_to_save[1] = 0x22;
-	data_to_save[2] = 0x33;
-	data_to_save[3] = 0x44;
-	sprintf(UART_BUFFER, "Save to eeprom:\n0x%02X\n0x%02X\n0x%02X\n0x%02X\n",
-			data_to_save[0], data_to_save[1], data_to_save[2], data_to_save[2]);
+void save_current_freq_to_eeprom(band_data_t band_data) {
+	sprintf(UART_BUFFER, "Save to eeprom: %lu\n", current_freq);
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
-
-	EEPROM_Write(3, 10, data_to_save, 4);
+	EEPROM_write_uint32(0, band_data.store_address, current_freq);
 
 }
 
-uint32_t get_current_freq_from_eeprom(void) {
-
-	uint8_t data_to_read[4];
-	EEPROM_Read(3, 10, data_to_read, 4);
-	sprintf(UART_BUFFER, "Read to eeprom:\n0x%02X\n0x%02X\n0x%02X\n0x%02X\n",
-			data_to_read[0], data_to_read[1], data_to_read[2], data_to_read[2]);
+uint32_t get_current_freq_from_eeprom(uint16_t store_address) {
+	uint32_t freq_from_eeprom = 0;
+	freq_from_eeprom = EEPROM_read_uint32(0, store_address);
+	sprintf(UART_BUFFER, "Read from eeprom: %lu\n", freq_from_eeprom);
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
-	return current_band.current_freq;
+
+	return freq_from_eeprom;
 }
 
 void handler(band_data_t current_band) {
 
-	//_encoder_process(current_band);
-	print_freq(current_band.max_freq);
+	encoder_process(current_band);
+
 
 }
 
@@ -135,7 +125,7 @@ void band_process(void) {
 
 }
 
-void _encoder_process(band_data_t current_band) {
+void encoder_process(band_data_t current_band) {
 	int32_t currCounter = __HAL_TIM_GET_COUNTER(&htim1);
 	currCounter = 32767 - ((currCounter - 1) & 0xFFFF);
 	if (currCounter != prevCounter) {
@@ -144,14 +134,17 @@ void _encoder_process(band_data_t current_band) {
 		if ((delta > -10) && (delta < 10)) {
 			if (delta < 0) {
 
-				freq = (freq >= current_band.max_freq) ?
-						current_band.max_freq : (freq += freq_change_step);
-				dds_set_freq(freq);
+				current_freq = (current_freq >= current_band.max_freq) ?
+						current_band.max_freq : (current_freq += freq_change_step);
+				dds_set_freq(current_freq);
+				print_freq(current_freq);
 			} else {
-				freq = (freq <= current_band.min_freq) ?
-						current_band.min_freq : (freq -= freq_change_step);
+				current_freq = (current_freq <= current_band.min_freq) ?
+						current_band.min_freq : (current_freq -= freq_change_step);
+				dds_set_freq(current_freq);
+				print_freq(current_freq);
 			}
-			dds_set_freq(freq);
+
 		}
 	}
 }
@@ -187,19 +180,3 @@ void print_freq(uint32_t freq) {
 
 }
 
-void test_eeprom(void) {
-	uint8_t xBuffer[2];
-	xBuffer[0] = 'M'; //0x4D
-	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) EEPRON_I2C_ADDRESS,
-	MEMORY_ADDRESS, 1, xBuffer, 1, 5);
-	HAL_Delay(10);
-	xBuffer[0] = 0x00; //clear buffer
-	HAL_Delay(100);
-	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) EEPRON_I2C_ADDRESS, MEMORY_ADDRESS, 1,
-			xBuffer, 1, 5);
-
-	sprintf(UART_BUFFER, "Read from EEPROM: 0x%d\r\n", xBuffer[0]);
-	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
-			100);
-
-}

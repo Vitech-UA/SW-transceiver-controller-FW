@@ -16,8 +16,8 @@
   ******************************************************************************
 */
 
-#ifndef INC_EEPROM_H_
-#define INC_EEPROM_H_
+#ifndef INC_AT24C256_H_
+#define INC_AT24C256_H_
 
 #include "stdint.h"
 #include "stm32f1xx_hal.h"
@@ -27,7 +27,10 @@ void EEPROM_Write (uint16_t page, uint16_t offset, uint8_t *data, uint16_t size)
 void EEPROM_Read (uint16_t page, uint16_t offset, uint8_t *data, uint16_t size);
 void EEPROM_PageErase (uint16_t page);
 
-void EEPROM_Write_NUM (uint16_t page, uint16_t offset, float  fdata);
-float EEPROM_Read_NUM (uint16_t page, uint16_t offset);
+void EEPROM_Write_float (uint16_t page, uint16_t offset, float  fdata);
+float EEPROM_Read_float (uint16_t page, uint16_t offset);
 
-#endif /* INC_EEPROM_H_ */
+void EEPROM_write_uint32(uint16_t page, uint16_t offset, uint32_t data);
+uint32_t EEPROM_read_uint32(uint16_t page, uint16_t offset);
+
+#endif /* INC_AT24C256_H_ */

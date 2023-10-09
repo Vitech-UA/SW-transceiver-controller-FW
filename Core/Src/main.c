@@ -17,6 +17,7 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <AT24C256.h>
 #include "main.h"
 #include "i2c.h"
 #include "spi.h"
@@ -29,7 +30,6 @@
 #include "band.h"
 #include <string.h>
 #include <stdio.h>
-#include "EEPROM.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,9 +105,6 @@ int main(void)
 	MAX7219_init();
 	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	HAL_TIM_Base_Start_IT(&htim2);
-
-	save_current_freq_to_eeprom();
-	get_current_freq_from_eeprom();
 
 
   /* USER CODE END 2 */
