@@ -70,8 +70,12 @@ void init_bands(void) {
 }
 
 void pre_handler(band_data_t current_band) {
-	//freq = get_current_freq_from_eeprom(current_band);
+	uint32_t freq = get_current_freq_from_eeprom();
 	dds_set_freq(freq);
+	print_freq(freq);
+	sprintf(UART_BUFFER, "pre_handler: %s\r\n", current_band.band_name);
+		HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+				100);
 }
 
 void post_handler(band_data_t current_band) {
@@ -109,8 +113,8 @@ uint32_t get_current_freq_from_eeprom(void) {
 
 void handler(band_data_t current_band) {
 
-	_encoder_process(current_band);
-	print_freq(freq);
+	//_encoder_process(current_band);
+	print_freq(current_band.max_freq);
 
 }
 
@@ -123,7 +127,8 @@ void band_process(void) {
 
 	while (prev_band.index == current_band.index) {
 		current_band.handler(current_band);
-		current_band = get_current_band();
+		prev_band = get_current_band();
+
 	}
 
 	current_band.post_handler(current_band);

@@ -68,7 +68,7 @@ void Error_Handler(void);
 #define Band_80m_GPIO_Port GPIOB
 #define Band_40m_Pin GPIO_PIN_13
 #define Band_40m_GPIO_Port GPIOB
-#define Band_20m_Pin GPIO_PIN_15
+#define Band_20m_Pin GPIO_PIN_14
 #define Band_20m_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
