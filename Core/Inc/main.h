@@ -57,19 +57,61 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_Pin GPIO_PIN_13
-#define LED_GPIO_Port GPIOC
+#define PAD9_Pin GPIO_PIN_13
+#define PAD9_GPIO_Port GPIOC
 #define ENC_BTN_Pin GPIO_PIN_14
 #define ENC_BTN_GPIO_Port GPIOC
 #define ENC_BTN_EXTI_IRQn EXTI15_10_IRQn
+#define ATT_Pin GPIO_PIN_15
+#define ATT_GPIO_Port GPIOC
+#define xV_BAT_Pin GPIO_PIN_0
+#define xV_BAT_GPIO_Port GPIOA
+#define PREAMP_Pin GPIO_PIN_1
+#define PREAMP_GPIO_Port GPIOA
+#define SWR_Pin GPIO_PIN_4
+#define SWR_GPIO_Port GPIOA
 #define MAX7219_NCS_Pin GPIO_PIN_6
 #define MAX7219_NCS_GPIO_Port GPIOA
+#define cEN_SWR_Pin GPIO_PIN_0
+#define cEN_SWR_GPIO_Port GPIOB
+#define A_Pin GPIO_PIN_1
+#define A_GPIO_Port GPIOB
+#define B_Pin GPIO_PIN_2
+#define B_GPIO_Port GPIOB
+#define C_Pin GPIO_PIN_10
+#define C_GPIO_Port GPIOB
+#define D_Pin GPIO_PIN_11
+#define D_GPIO_Port GPIOB
 #define Band_80m_Pin GPIO_PIN_12
 #define Band_80m_GPIO_Port GPIOB
 #define Band_40m_Pin GPIO_PIN_13
 #define Band_40m_GPIO_Port GPIOB
 #define Band_20m_Pin GPIO_PIN_14
 #define Band_20m_GPIO_Port GPIOB
+#define TX_OUT_Pin GPIO_PIN_15
+#define TX_OUT_GPIO_Port GPIOB
+#define cENC_A_Pin GPIO_PIN_8
+#define cENC_A_GPIO_Port GPIOA
+#define cENC_B_Pin GPIO_PIN_9
+#define cENC_B_GPIO_Port GPIOA
+#define cENC_BTN_Pin GPIO_PIN_10
+#define cENC_BTN_GPIO_Port GPIOA
+#define PAD10_Pin GPIO_PIN_11
+#define PAD10_GPIO_Port GPIOA
+#define PAD11_Pin GPIO_PIN_12
+#define PAD11_GPIO_Port GPIOA
+#define PAD12_Pin GPIO_PIN_15
+#define PAD12_GPIO_Port GPIOA
+#define cTX_RX_Pin GPIO_PIN_3
+#define cTX_RX_GPIO_Port GPIOB
+#define cEN_PREAMP_Pin GPIO_PIN_4
+#define cEN_PREAMP_GPIO_Port GPIOB
+#define cEN_ATT_Pin GPIO_PIN_5
+#define cEN_ATT_GPIO_Port GPIOB
+#define PAD7_Pin GPIO_PIN_8
+#define PAD7_GPIO_Port GPIOB
+#define PAD8_Pin GPIO_PIN_9
+#define PAD8_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
