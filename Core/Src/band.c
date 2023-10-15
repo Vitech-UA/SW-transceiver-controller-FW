@@ -21,6 +21,10 @@ uint8_t active_20m_band_flag = 0;
 uint8_t active_40m_band_flag = 0;
 uint8_t active_80m_band_flag = 0;
 
+TM1638_Handler_t Handler;
+
+uint32_t intermediate_frequency_hz = 8885000;
+
 extern I2C_HandleTypeDef hi2c1;
 
 band_data_t band_80m;
@@ -30,8 +34,7 @@ band_data_t current_band;
 band_data_t prev_band;
 uint32_t prevCounter = 0;
 volatile uint32_t current_freq = 0;
-uint32_t freq_change_step = 1000;
-TM1638_Handler_t Handler;
+uint32_t freq_change_step = 100;
 
 enum {
 	BAND_20M = 0, BAND_40M, BAND_80M,
@@ -172,7 +175,7 @@ band_data_t get_current_band() {
 }
 
 void dds_set_freq(uint32_t freq) {
-	si5351_set_freq(freq);
+	si5351_set_freq(freq - intermediate_frequency_hz);
 
 }
 
