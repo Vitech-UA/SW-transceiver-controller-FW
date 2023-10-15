@@ -105,12 +105,9 @@ int main(void) {
 	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	HAL_TIM_Base_Start_IT(&htim2);
 
-	TM1638_Platform_Init(&Handler);
-	TM1638_Init(&Handler, TM1638DisplayTypeComAnode);
-	TM1638_ConfigDisplay(&Handler, 7, TM1638DisplayStateON);
+
 
 	/* USER CODE END 2 */
-    //print_freq(7150650);
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
