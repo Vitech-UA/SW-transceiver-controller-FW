@@ -4,15 +4,15 @@
  *  Created on: Feb 6, 2023
  *      Author: Viktor Starovit
  */
-#include <AT24C256.h>
+
 #include "band.h"
 #include "stdint.h"
 #include "main.h"
 #include "string.h"
 #include "stdio.h"
 #include "tim.h"
-#include "si5351.h"
-#include "max7219.h"
+
+#include "driver.h"
 extern UART_HandleTypeDef huart2;
 extern char UART_BUFFER[40];
 
@@ -31,6 +31,7 @@ band_data_t prev_band;
 uint32_t prevCounter = 0;
 volatile uint32_t current_freq = 0;
 uint32_t freq_change_step = 1000;
+TM1638_Handler_t Handler;
 
 enum {
 	BAND_20M = 0, BAND_40M, BAND_80M,
@@ -176,7 +177,22 @@ void dds_set_freq(uint32_t freq) {
 }
 
 void print_freq(uint32_t freq) {
-	MAX7219_print_int(freq);
+	uint8_t data_to_display[6];
+	data_to_display[0] = freq % 100000000 / 10000000;
+	data_to_display[1] = freq % 10000000 / 1000000;
+	data_to_display[2] = freq % 1000000 / 100000;
+	data_to_display[3] = freq % 100000 / 10000;
+	data_to_display[4] = freq % 10000 / 1000;
+	data_to_display[5] = freq % 1000 / 100;
+
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[0], 0);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[1] | TM1638DecimalPoint,
+			1);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[2], 2);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[3], 3);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[4] | TM1638DecimalPoint,
+			4);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[5], 5);
 
 }
 

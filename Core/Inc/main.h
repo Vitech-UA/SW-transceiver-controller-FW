@@ -70,8 +70,6 @@ void Error_Handler(void);
 #define PREAMP_GPIO_Port GPIOA
 #define SWR_Pin GPIO_PIN_4
 #define SWR_GPIO_Port GPIOA
-#define MAX7219_NCS_Pin GPIO_PIN_6
-#define MAX7219_NCS_GPIO_Port GPIOA
 #define cEN_SWR_Pin GPIO_PIN_0
 #define cEN_SWR_GPIO_Port GPIOB
 #define A_Pin GPIO_PIN_1

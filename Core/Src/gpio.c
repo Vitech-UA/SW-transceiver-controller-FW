@@ -51,11 +51,14 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, PAD9_Pin|ATT_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(PAD9_GPIO_Port, PAD9_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, PREAMP_Pin|SWR_Pin|MAX7219_NCS_Pin|PAD10_Pin
-                          |PAD11_Pin|PAD12_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(ATT_GPIO_Port, ATT_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, PREAMP_Pin|SWR_Pin|PAD10_Pin|PAD11_Pin
+                          |PAD12_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, A_Pin|B_Pin|C_Pin|TX_OUT_Pin
@@ -76,9 +79,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(ENC_BTN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PAPin PAPin PAPin PAPin
-                           PAPin PAPin */
-  GPIO_InitStruct.Pin = PREAMP_Pin|SWR_Pin|MAX7219_NCS_Pin|PAD10_Pin
-                          |PAD11_Pin|PAD12_Pin;
+                           PAPin */
+  GPIO_InitStruct.Pin = PREAMP_Pin|SWR_Pin|PAD10_Pin|PAD11_Pin
+                          |PAD12_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
