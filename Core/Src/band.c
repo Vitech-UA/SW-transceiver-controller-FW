@@ -175,7 +175,7 @@ band_data_t get_current_band() {
 }
 
 void dds_set_freq(uint32_t freq) {
-	si5351_set_freq(freq - intermediate_frequency_hz);
+	si5351_set_freq(freq + intermediate_frequency_hz);
 
 }
 
