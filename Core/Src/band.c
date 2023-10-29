@@ -23,7 +23,7 @@ uint8_t active_80m_band_flag = 0;
 
 TM1638_Handler_t Handler;
 
-uint32_t intermediate_frequency_hz = 8885000;
+uint32_t intermediate_frequency_hz = 0;
 
 extern I2C_HandleTypeDef hi2c1;
 
@@ -77,7 +77,8 @@ void init_bands(void) {
 }
 
 void pre_handler(band_data_t current_band) {
-	current_freq = get_current_freq_from_eeprom(current_band.store_address);
+//	current_freq = get_current_freq_from_eeprom(current_band.store_address);
+	current_freq = current_band.min_freq;
 	dds_set_freq(current_freq);
 	print_freq(current_freq);
 
