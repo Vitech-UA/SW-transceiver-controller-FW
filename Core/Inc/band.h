@@ -20,6 +20,7 @@ typedef struct {
 	uint32_t max_freq;
 	uint32_t min_freq;
 	uint32_t current_freq;
+	uint32_t default_freq;
 	uint8_t band_code;
 	uint8_t store_address;
 	uint8_t index;

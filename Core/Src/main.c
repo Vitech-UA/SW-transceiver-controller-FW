@@ -107,15 +107,16 @@ int main(void) {
 
 	TM1638_Platform_Init(&Handler);
 	TM1638_Init(&Handler, TM1638DisplayTypeComAnode);
-	TM1638_ConfigDisplay(&Handler, 7, TM1638DisplayStateON);
+	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateON);
+
+
 
 	/* USER CODE END 2 */
-    //print_freq(7150650);
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		//
+
 		band_process();
 
 		/* USER CODE END WHILE */
@@ -143,7 +144,7 @@ void SystemClock_Config(void) {
 	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL2;
+	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
 		Error_Handler();
 	}
@@ -157,17 +158,50 @@ void SystemClock_Config(void) {
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
 	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
 		Error_Handler();
 	}
 	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-	PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
+	PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
 	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
 		Error_Handler();
 	}
 }
 
 /* USER CODE BEGIN 4 */
+
+void init() {
+	//const char wmsg[] = "Some data";
+	uint32_t wmsg = 1999;
+	char rmsg[sizeof(wmsg)];
+	uint16_t devAddr = 0xA0;
+	uint16_t memAddr = 0x00;
+	HAL_StatusTypeDef status;
+
+	// Hint: try to comment this line
+	HAL_I2C_Mem_Write(&hi2c1, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT,
+			(uint8_t*) wmsg, sizeof(wmsg), HAL_MAX_DELAY);
+
+	for (;;) { // wait...
+		status = HAL_I2C_IsDeviceReady(&hi2c1, devAddr, 1,
+		HAL_MAX_DELAY);
+		if (status == HAL_OK)
+			break;
+	}
+
+	HAL_I2C_Mem_Read(&hi2c1, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT,
+			(uint8_t*) rmsg, sizeof(rmsg), HAL_MAX_DELAY);
+
+	if (memcmp(rmsg, wmsg, sizeof(rmsg)) == 0) {
+		const char result[] = "Test passed!\r\n";
+		HAL_UART_Transmit(&huart2, (uint8_t*) result, sizeof(result) - 1,
+		HAL_MAX_DELAY);
+	} else {
+		const char result[] = "Test failed :(\r\n";
+		HAL_UART_Transmit(&huart2, (uint8_t*) result, sizeof(result) - 1,
+		HAL_MAX_DELAY);
+	}
+}
 
 void i2c_check_devices(void) {
 	if (HAL_I2C_IsDeviceReady(&hi2c1, EEPRON_I2C_ADDRESS, 10, 100) == HAL_OK) {

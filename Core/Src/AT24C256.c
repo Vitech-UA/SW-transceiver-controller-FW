@@ -28,8 +28,8 @@ extern I2C_HandleTypeDef hi2c1;
 #define EEPROM_ADDR 0xA0
 
 // Define the Page Size and number of pages
-#define PAGE_SIZE 64     // in Bytes
-#define PAGE_NUM  512    // number of pages
+#define PAGE_SIZE 8     // in Bytes
+#define PAGE_NUM  32    // number of pages
 
 /*****************************************************************************************************************************************/
 uint8_t bytes_temp[4];
@@ -196,6 +196,41 @@ uint32_t EEPROM_read_uint32(uint16_t page, uint16_t offset) {
 	uint32_t int_to_return = 0;
 	uint8_t data[4];
 	EEPROM_Read(page, offset, data, 4);
+	int_to_return = data[3];
+	int_to_return <<= 8;
+	int_to_return |= data[2];
+	int_to_return <<= 8;
+	int_to_return |= data[1];
+	int_to_return <<= 8;
+	int_to_return |= data[0];
+	return int_to_return;
+}
+
+void EEPROM_write_HAL_based(uint16_t memAddr, uint32_t data_to_write) {
+
+	uint8_t data[4];
+	data[0] = data_to_write;
+	data[1] = (data_to_write >> 8);
+	data[2] = (data_to_write >> 16);
+	data[3] = (data_to_write >> 24);
+	HAL_StatusTypeDef status;
+	HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, memAddr, I2C_MEMADD_SIZE_8BIT,
+			(uint8_t*) data, sizeof(data), HAL_MAX_DELAY);
+
+	for (;;) { // wait...
+		status = HAL_I2C_IsDeviceReady(&hi2c1, EEPROM_ADDR, 1,
+		HAL_MAX_DELAY);
+		if (status == HAL_OK)
+			break;
+	}
+
+}
+
+uint32_t EEPROM_read_HAL_based(uint16_t memAddr) {
+	uint32_t int_to_return = 0;
+	uint8_t data[4];
+	HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, memAddr, I2C_MEMADD_SIZE_8BIT,
+			(uint8_t*) data, sizeof(data), HAL_MAX_DELAY);
 	int_to_return = data[3];
 	int_to_return <<= 8;
 	int_to_return |= data[2];

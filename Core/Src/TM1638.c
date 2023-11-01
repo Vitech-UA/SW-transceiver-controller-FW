@@ -141,10 +141,10 @@ TM1638_WriteBytes(TM1638_Handler_t *Handler,
     for (i = 0, Buff = Data[j]; i < 8; ++i, Buff >>= 1)
     {
       Handler->ClkWrite(0);
-      //Handler->DelayUs(1);
+      Handler->DelayUs(1);
       Handler->DioWrite(Buff & 0x01);
       Handler->ClkWrite(1);
-      //Handler->DelayUs(1);
+      Handler->DelayUs(1);
     }
   }
 }
