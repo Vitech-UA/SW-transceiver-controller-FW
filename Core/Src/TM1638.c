@@ -539,7 +539,7 @@ TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const uint8_t *DigitData,
   }
 
   return TM1638_SetMultipleDigit(Handler,
-                                 (const uint8_t *)DigitDataHEX, StartAddr, Count);
+                                 (uint8_t *)DigitDataHEX, StartAddr, Count);
 }
 
 
@@ -723,7 +723,7 @@ TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const uint8_t *DigitData
   }
 
   return TM1638_SetMultipleDigit(Handler,
-                                 (const uint8_t *)DigitDataHEX, StartAddr, Count);
+                                 (uint8_t *)DigitDataHEX, StartAddr, Count);
 }
 
 

@@ -30,6 +30,7 @@
 #include <string.h>
 #include "driver.h"
 #include <stdio.h>
+#include "periph.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,6 +99,7 @@ int main(void) {
 	MX_TIM2_Init();
 	MX_ADC1_Init();
 	/* USER CODE BEGIN 2 */
+
 	//System Init
 	i2c_check_devices();
 	init_bands();
@@ -109,6 +111,9 @@ int main(void) {
 	TM1638_Init(&Handler, TM1638DisplayTypeComAnode);
 	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateON);
 
+     set_swr_meter(ENABLE_SWR_METER);
+     set_ATT(ENABLE_ATT);
+     set_preamp(ENABLE_PREAMP);
 
 
 	/* USER CODE END 2 */
@@ -169,39 +174,6 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
-
-void init() {
-	//const char wmsg[] = "Some data";
-	uint32_t wmsg = 1999;
-	char rmsg[sizeof(wmsg)];
-	uint16_t devAddr = 0xA0;
-	uint16_t memAddr = 0x00;
-	HAL_StatusTypeDef status;
-
-	// Hint: try to comment this line
-	HAL_I2C_Mem_Write(&hi2c1, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT,
-			(uint8_t*) wmsg, sizeof(wmsg), HAL_MAX_DELAY);
-
-	for (;;) { // wait...
-		status = HAL_I2C_IsDeviceReady(&hi2c1, devAddr, 1,
-		HAL_MAX_DELAY);
-		if (status == HAL_OK)
-			break;
-	}
-
-	HAL_I2C_Mem_Read(&hi2c1, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT,
-			(uint8_t*) rmsg, sizeof(rmsg), HAL_MAX_DELAY);
-
-	if (memcmp(rmsg, wmsg, sizeof(rmsg)) == 0) {
-		const char result[] = "Test passed!\r\n";
-		HAL_UART_Transmit(&huart2, (uint8_t*) result, sizeof(result) - 1,
-		HAL_MAX_DELAY);
-	} else {
-		const char result[] = "Test failed :(\r\n";
-		HAL_UART_Transmit(&huart2, (uint8_t*) result, sizeof(result) - 1,
-		HAL_MAX_DELAY);
-	}
-}
 
 void i2c_check_devices(void) {
 	if (HAL_I2C_IsDeviceReady(&hi2c1, EEPRON_I2C_ADDRESS, 10, 100) == HAL_OK) {
