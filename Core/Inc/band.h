@@ -54,4 +54,5 @@ void save_current_freq_to_eeprom(band_data_t band_data);
 void dds_set_freq(uint32_t freq);
 void test_eeprom(void);
 void print_freq(uint32_t freq);
+void set_band_code(band_data_t current_band);
 #endif /* INC_BAND_H_ */
