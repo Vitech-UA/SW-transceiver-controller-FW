@@ -70,8 +70,8 @@ void Error_Handler(void);
 #define PREAMP_GPIO_Port GPIOA
 #define SWR_Pin GPIO_PIN_4
 #define SWR_GPIO_Port GPIOA
-#define cEN_SWR_Pin GPIO_PIN_0
-#define cEN_SWR_GPIO_Port GPIOB
+#define cEN_PREAMPL_Pin GPIO_PIN_0
+#define cEN_PREAMPL_GPIO_Port GPIOB
 #define A_Pin GPIO_PIN_1
 #define A_GPIO_Port GPIOB
 #define B_Pin GPIO_PIN_2
@@ -100,11 +100,7 @@ void Error_Handler(void);
 #define PAD11_GPIO_Port GPIOA
 #define PAD12_Pin GPIO_PIN_15
 #define PAD12_GPIO_Port GPIOA
-#define cTX_RX_Pin GPIO_PIN_3
-#define cTX_RX_GPIO_Port GPIOB
-#define cEN_PREAMP_Pin GPIO_PIN_4
-#define cEN_PREAMP_GPIO_Port GPIOB
-#define cEN_ATT_Pin GPIO_PIN_5
+#define cEN_ATT_Pin GPIO_PIN_3
 #define cEN_ATT_GPIO_Port GPIOB
 #define PAD7_Pin GPIO_PIN_8
 #define PAD7_GPIO_Port GPIOB

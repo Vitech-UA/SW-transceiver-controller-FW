@@ -11,6 +11,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "tim.h"
+#include "periph.h"
 
 #include "driver.h"
 extern UART_HandleTypeDef huart2;
@@ -100,7 +101,7 @@ void pre_handler(band_data_t current_band)
 	sprintf(UART_BUFFER, "Current freq: %lu\n", current_freq);
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
-
+	set_band_code(current_band);
 	dds_set_freq(current_freq);
 	print_freq(current_freq);
 
@@ -136,8 +137,12 @@ uint32_t get_current_freq_from_eeprom(uint16_t store_address)
 
 void handler(band_data_t current_band)
 {
-	set_band_code(current_band);
+
 	encoder_process(current_band);
+	set_preamp(!HAL_GPIO_ReadPin(cEN_PREAMPL_GPIO_Port, cEN_PREAMPL_Pin));
+	set_ATT(!HAL_GPIO_ReadPin(cEN_ATT_GPIO_Port, cEN_ATT_Pin));
+
+
 }
 
 void band_process(void)
@@ -151,6 +156,7 @@ void band_process(void)
 		prev_band = get_current_band();
 	}
 	current_band.post_handler(current_band);
+
 }
 
 void encoder_process(band_data_t current_band)
