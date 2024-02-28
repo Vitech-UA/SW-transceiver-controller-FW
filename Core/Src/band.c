@@ -26,7 +26,7 @@ uint8_t active_80m_band_flag = 0;
 
 TM1638_Handler_t Handler;
 
-uint32_t intermediate_frequency_hz = 0;
+uint32_t intermediate_frequency_hz = 8865000;
 
 extern I2C_HandleTypeDef hi2c1;
 
@@ -37,7 +37,7 @@ band_data_t current_band;
 band_data_t prev_band;
 uint32_t prevCounter = 0;
 volatile uint32_t current_freq = 0;
-uint32_t freq_change_step = 100;
+uint32_t freq_change_step = 50;
 
 enum
 {
@@ -57,6 +57,7 @@ void init_bands(void)
 	band_80m.current_freq = 0;
 	band_80m.index = BAND_80M;
 	band_80m.store_address = 0x00;
+	band_80m.calib_freq_hz = 2500;
 
 	band_40m.max_freq = 7200000;
 	band_40m.default_freq = 7100000;
@@ -69,6 +70,7 @@ void init_bands(void)
 	band_40m.current_freq = 0;
 	band_40m.index = BAND_40M;
 	band_40m.store_address = 0x10;
+	band_40m.calib_freq_hz = 2900;
 
 	band_20m.max_freq = 14350000;
 	band_20m.default_freq = 14175000;
@@ -81,6 +83,7 @@ void init_bands(void)
 	band_20m.current_freq = 0;
 	band_20m.index = BAND_20M;
 	band_20m.store_address = 0x20;
+	band_20m.calib_freq_hz = 3800;
 
 }
 
@@ -141,7 +144,7 @@ void handler(band_data_t current_band)
 	encoder_process(current_band);
 	set_preamp(!HAL_GPIO_ReadPin(cEN_PREAMPL_GPIO_Port, cEN_PREAMPL_Pin));
 	set_ATT(!HAL_GPIO_ReadPin(cEN_ATT_GPIO_Port, cEN_ATT_Pin));
-
+	set_RxTx(!HAL_GPIO_ReadPin(cTx_Rx_GPIO_Port, cTx_Rx_Pin));
 
 }
 
@@ -194,7 +197,9 @@ void encoder_process(band_data_t current_band)
 				}
 
 			}
-			current_band.current_freq = current_freq;
+			current_band.current_freq = (current_freq
+					+ intermediate_frequency_hz)
+					- (current_band.calib_freq_hz * 2);
 			dds_set_freq(current_freq);
 			print_freq(current_freq);
 		}
@@ -235,7 +240,6 @@ void print_freq(uint32_t freq)
 	data_to_display[3] = freq % 100000 / 10000;
 	data_to_display[4] = freq % 10000 / 1000;
 	data_to_display[5] = freq % 1000 / 100;
-
 	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[0], 0);
 	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[1] | TM1638DecimalPoint,
 			1);
@@ -251,10 +255,14 @@ void set_band_code(band_data_t current_band)
 {
 
 	uint8_t mask = current_band.band_code;
-	HAL_GPIO_WritePin(A_GPIO_Port, A_Pin, (mask & 0b1000) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(B_GPIO_Port, B_Pin, (mask & 0b0100) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(C_GPIO_Port, C_Pin, (mask & 0b0010) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(D_GPIO_Port, D_Pin, (mask & 0b0001) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(A_GPIO_Port, A_Pin,
+			(mask & 0b1000) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(B_GPIO_Port, B_Pin,
+			(mask & 0b0100) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(C_GPIO_Port, C_Pin,
+			(mask & 0b0010) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(D_GPIO_Port, D_Pin,
+			(mask & 0b0001) ? GPIO_PIN_SET : GPIO_PIN_RESET);
 
 }
 

@@ -102,6 +102,8 @@ void Error_Handler(void);
 #define PAD12_GPIO_Port GPIOA
 #define cEN_ATT_Pin GPIO_PIN_3
 #define cEN_ATT_GPIO_Port GPIOB
+#define cTx_Rx_Pin GPIO_PIN_4
+#define cTx_Rx_GPIO_Port GPIOB
 #define PAD7_Pin GPIO_PIN_8
 #define PAD7_GPIO_Port GPIOB
 #define PAD8_Pin GPIO_PIN_9

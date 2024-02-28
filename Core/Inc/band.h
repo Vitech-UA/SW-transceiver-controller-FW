@@ -24,6 +24,7 @@ typedef struct {
 	uint8_t band_code;
 	uint8_t store_address;
 	uint8_t index;
+	uint16_t calib_freq_hz;
 	char* band_name;
 	// handlers
 	band_handler pre_handler;

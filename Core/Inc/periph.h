@@ -27,9 +27,15 @@ typedef enum {
 
 } state_ATT_t;
 
+typedef enum {
+	Rx = 0, Tx,
+
+} state_RxTx_t;
+
 void set_tranceiver_state(transiver_state_t state);
 void set_swr_meter(state_SWR_t state);
 void set_preamp(state_PREAMP_t state);
 void set_ATT(state_ATT_t state);
+void set_RxTx(state_RxTx_t state);
 
 #endif /* INC_PERIPH_H_ */

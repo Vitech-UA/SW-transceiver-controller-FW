@@ -28,3 +28,7 @@ void set_preamp(state_PREAMP_t state){
 void set_ATT(state_ATT_t state){
     HAL_GPIO_WritePin(ATT_GPIO_Port, ATT_Pin, state);
 }
+
+void set_RxTx(state_RxTx_t state){
+    HAL_GPIO_WritePin(TX_OUT_GPIO_Port, TX_OUT_Pin, !state);
+}
