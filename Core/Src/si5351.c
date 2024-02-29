@@ -113,7 +113,7 @@ void si5351_Init(int32_t correction) {
     si5351_write(SI5351_REGISTER_23_CLK7_CONTROL, 0x80);
 
 
-    si5351CrystalLoad_t crystalLoad = SI5351_CRYSTAL_LOAD_10PF;
+    si5351CrystalLoad_t crystalLoad = SI5351_CRYSTAL_LOAD_8PF;
     si5351_write(SI5351_REGISTER_183_CRYSTAL_INTERNAL_LOAD_CAPACITANCE, crystalLoad);
 }
 
@@ -365,12 +365,13 @@ void si5351_writeBulk(uint8_t baseaddr, int32_t P1, int32_t P2, int32_t P3, uint
     si5351_write(baseaddr+7, P2 & 0xFF);
 }
 
-void si5351_set_freq(uint32_t freq) {
+void si5351_set_freq(uint32_t freq_hz) {
+	si5351_Init(13460);
 	si5351PLLConfig_t pll_conf;
 	si5351OutputConfig_t out_conf;
-	si5351_Calc(freq, &pll_conf, &out_conf);
+	si5351_Calc(freq_hz, &pll_conf, &out_conf);
 	si5351_SetupPLL(SI5351_PLL_A, &pll_conf);
-	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_8MA, &out_conf,
+	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_2MA, &out_conf,
 			0);
 	si5351_EnableOutputs(1 << 0);
 

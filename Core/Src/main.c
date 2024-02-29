@@ -104,7 +104,7 @@ int main(void)
 	//System Init
 	i2c_check_devices();
 	init_bands();
-	si5351_Init(1);
+
 	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	HAL_TIM_Base_Start_IT(&htim2);
 
@@ -113,6 +113,7 @@ int main(void)
 	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateON);
 
 
+	//si5351_set_freq(15000000);
 
   /* USER CODE END 2 */
 

@@ -57,7 +57,6 @@ void init_bands(void)
 	band_80m.current_freq = 0;
 	band_80m.index = BAND_80M;
 	band_80m.store_address = 0x00;
-	band_80m.calib_freq_hz = 2500;
 
 	band_40m.max_freq = 7200000;
 	band_40m.default_freq = 7100000;
@@ -70,7 +69,7 @@ void init_bands(void)
 	band_40m.current_freq = 0;
 	band_40m.index = BAND_40M;
 	band_40m.store_address = 0x10;
-	band_40m.calib_freq_hz = 2900;
+
 
 	band_20m.max_freq = 14350000;
 	band_20m.default_freq = 14175000;
@@ -83,7 +82,6 @@ void init_bands(void)
 	band_20m.current_freq = 0;
 	band_20m.index = BAND_20M;
 	band_20m.store_address = 0x20;
-	band_20m.calib_freq_hz = 3800;
 
 }
 
@@ -105,7 +103,7 @@ void pre_handler(band_data_t current_band)
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
 	set_band_code(current_band);
-	dds_set_freq(current_freq);
+	dds_set_freq(current_freq + intermediate_frequency_hz);
 	print_freq(current_freq);
 
 }
@@ -197,10 +195,8 @@ void encoder_process(band_data_t current_band)
 				}
 
 			}
-			current_band.current_freq = (current_freq
-					+ intermediate_frequency_hz)
-					- (current_band.calib_freq_hz * 2);
-			dds_set_freq(current_freq);
+			current_band.current_freq = current_freq;
+			dds_set_freq(current_freq + intermediate_frequency_hz);
 			print_freq(current_freq);
 		}
 	}
@@ -227,7 +223,7 @@ band_data_t get_current_band()
 
 void dds_set_freq(uint32_t freq)
 {
-	si5351_set_freq(freq + intermediate_frequency_hz);
+	si5351_set_freq(freq);
 
 }
 
