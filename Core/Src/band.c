@@ -18,6 +18,7 @@ extern UART_HandleTypeDef huart2;
 extern char UART_BUFFER[40];
 
 #define USE_EEPROM
+#define MAX_STEPS 4
 
 uint8_t btn_pressed_flag = 0;
 uint8_t active_20m_band_flag = 0;
@@ -37,8 +38,10 @@ band_data_t current_band;
 band_data_t prev_band;
 uint32_t prevCounter = 0;
 volatile uint32_t current_freq = 0;
+uint8_t step_index = 1;
+uint16_t freq_steps[MAX_STEPS] =
+{ 10, 50, 100, 1000};
 uint32_t freq_change_step = 50;
-
 enum
 {
 	BAND_20M = 0, BAND_40M, BAND_80M,
@@ -69,7 +72,6 @@ void init_bands(void)
 	band_40m.current_freq = 0;
 	band_40m.index = BAND_40M;
 	band_40m.store_address = 0x10;
-
 
 	band_20m.max_freq = 14350000;
 	band_20m.default_freq = 14175000;
@@ -143,6 +145,27 @@ void handler(band_data_t current_band)
 	set_preamp(!HAL_GPIO_ReadPin(cEN_PREAMPL_GPIO_Port, cEN_PREAMPL_Pin));
 	set_ATT(!HAL_GPIO_ReadPin(cEN_ATT_GPIO_Port, cEN_ATT_Pin));
 	set_RxTx(!HAL_GPIO_ReadPin(cTx_Rx_GPIO_Port, cTx_Rx_Pin));
+	if (HAL_GPIO_ReadPin(cENC_BTN_GPIO_Port, cENC_BTN_Pin))
+	{
+		step_process();
+	}
+
+}
+
+void step_process(void)
+{
+	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateOFF);
+	if (step_index < MAX_STEPS - 1)
+		step_index++;
+	else
+		step_index = 0;
+	freq_change_step = freq_steps[step_index];
+	print_step(freq_steps[step_index]);
+	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateON);
+	HAL_Delay(400);
+	TM1638_Init(&Handler, TM1638DisplayTypeComAnode);
+	TM1638_ConfigDisplay(&Handler, 5, TM1638DisplayStateON);
+	print_freq(current_freq);
 
 }
 
@@ -224,6 +247,22 @@ band_data_t get_current_band()
 void dds_set_freq(uint32_t freq)
 {
 	si5351_set_freq(freq);
+
+}
+
+void print_step(uint16_t step)
+{
+	uint8_t data_to_display[4];
+	data_to_display[0] = step % 10000 / 1000;
+	data_to_display[1] = step % 1000 / 100;
+	data_to_display[2] = step % 100 / 10;
+	data_to_display[3] = step % 10 / 1;
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[0], 2);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[1], 3);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[2], 4);
+	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[3], 5);
+	TM1638_SetSingleDigit_HEX(&Handler, 0x6D, 0);
+	TM1638_SetSingleDigit_HEX(&Handler, 0x78, 1);
 
 }
 

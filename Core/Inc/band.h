@@ -35,14 +35,11 @@ typedef struct {
 } band_data_t;
 
 
-
-
-
-
 void init_bands(void);
 void band_process(void);
 band_data_t get_current_band(void);
 void encoder_process(band_data_t current_band);
+void step_process(void);
 
 // band_general
 void pre_handler(band_data_t current_band);
@@ -54,5 +51,6 @@ void save_current_freq_to_eeprom(band_data_t band_data);
 void dds_set_freq(uint32_t freq);
 void test_eeprom(void);
 void print_freq(uint32_t freq);
+void print_step(uint16_t step);
 void set_band_code(band_data_t current_band);
 #endif /* INC_BAND_H_ */

@@ -110,7 +110,7 @@ int main(void)
 
 	TM1638_Platform_Init(&Handler);
 	TM1638_Init(&Handler, TM1638DisplayTypeComAnode);
-	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateON);
+	TM1638_ConfigDisplay(&Handler, 5, TM1638DisplayStateON);
 
 
 	//si5351_set_freq(15000000);
