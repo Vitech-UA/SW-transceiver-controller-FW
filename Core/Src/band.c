@@ -12,13 +12,13 @@
 #include "stdio.h"
 #include "tim.h"
 #include "periph.h"
-
+#include "eeprom_store_addr.h"
 #include "driver.h"
 extern UART_HandleTypeDef huart2;
 extern char UART_BUFFER[40];
 
 #define USE_EEPROM
-#define MAX_STEPS 4
+#define MAX_STEPS 5
 
 uint8_t btn_pressed_flag = 0;
 uint8_t active_20m_band_flag = 0;
@@ -40,7 +40,7 @@ uint32_t prevCounter = 0;
 volatile uint32_t current_freq = 0;
 uint8_t step_index = 1;
 uint16_t freq_steps[MAX_STEPS] =
-{ 10, 50, 100, 1000};
+{ 10, 50, 100, 500, 1000 };
 uint32_t freq_change_step = 50;
 enum
 {
@@ -59,7 +59,7 @@ void init_bands(void)
 	band_80m.band_name = "80m (3.65 MHz)";
 	band_80m.current_freq = 0;
 	band_80m.index = BAND_80M;
-	band_80m.store_address = 0x00;
+	band_80m.store_address = BAND_80M_STORE_ADDRESS;
 
 	band_40m.max_freq = 7200000;
 	band_40m.default_freq = 7100000;
@@ -71,7 +71,7 @@ void init_bands(void)
 	band_40m.band_name = "40m (7.1 MHz)";
 	band_40m.current_freq = 0;
 	band_40m.index = BAND_40M;
-	band_40m.store_address = 0x10;
+	band_40m.store_address = BAND_40M_STORE_ADDRESS;
 
 	band_20m.max_freq = 14350000;
 	band_20m.default_freq = 14175000;
@@ -83,7 +83,7 @@ void init_bands(void)
 	band_20m.band_name = "20m (14.175 MHz)";
 	band_20m.current_freq = 0;
 	band_20m.index = BAND_20M;
-	band_20m.store_address = 0x20;
+	band_20m.store_address = BAND_80M_STORE_ADDRESS;
 
 }
 
@@ -104,6 +104,7 @@ void pre_handler(band_data_t current_band)
 	sprintf(UART_BUFFER, "Current freq: %lu\n", current_freq);
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
+	step_index = get_current_step_from_eeprom(STEP_STORE_ADDRESS);
 	set_band_code(current_band);
 	dds_set_freq(current_freq + intermediate_frequency_hz);
 	print_freq(current_freq);
@@ -116,6 +117,26 @@ void post_handler(band_data_t current_band)
 	save_current_freq_to_eeprom(current_band);
 #endif
 	current_band.current_freq = current_freq;
+}
+
+void save_current_step_to_eeprom(uint16_t step)
+{
+	sprintf(UART_BUFFER, "Save step to eeprom: %i\n", step);
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
+	EEPROM_write_HAL_based(STEP_STORE_ADDRESS, step);
+
+}
+
+uint32_t get_current_step_from_eeprom(uint16_t store_address)
+{
+	uint32_t step_from_eeprom = 0;
+	step_from_eeprom = EEPROM_read_HAL_based(store_address);
+	sprintf(UART_BUFFER, "Read step from eeprom: %lu\n", step_from_eeprom);
+	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
+			100);
+
+	return step_from_eeprom;
 }
 
 void save_current_freq_to_eeprom(band_data_t band_data)
@@ -164,7 +185,8 @@ void step_process(void)
 	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateON);
 	HAL_Delay(400);
 	TM1638_Init(&Handler, TM1638DisplayTypeComAnode);
-	TM1638_ConfigDisplay(&Handler, 5, TM1638DisplayStateON);
+	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateON);
+	save_current_step_to_eeprom(step_index);
 	print_freq(current_freq);
 
 }
@@ -257,12 +279,26 @@ void print_step(uint16_t step)
 	data_to_display[1] = step % 1000 / 100;
 	data_to_display[2] = step % 100 / 10;
 	data_to_display[3] = step % 10 / 1;
-	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[0], 2);
-	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[1], 3);
-	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[2], 4);
-	TM1638_SetSingleDigit_HEX(&Handler, data_to_display[3], 5);
-	TM1638_SetSingleDigit_HEX(&Handler, 0x6D, 0);
-	TM1638_SetSingleDigit_HEX(&Handler, 0x78, 1);
+
+	for (uint8_t i = 0; i <= 5; i++)
+	{
+		TM1638_SetSingleDigit_HEX(&Handler, 0x78, i); // off
+	}
+
+	if (step >= 10)
+	{
+		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[3], 5);
+		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[2], 4);
+
+	}
+	if (step >= 100)
+	{
+		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[1], 3);
+	}
+	if (step >= 1000)
+	{
+		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[0], 2);
+	}
 
 }
 

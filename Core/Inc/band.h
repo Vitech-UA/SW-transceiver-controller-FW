@@ -46,6 +46,8 @@ void pre_handler(band_data_t current_band);
 void post_handler(band_data_t current_band);
 void handler(band_data_t current_band);
 //
+void save_current_step_to_eeprom(uint16_t step);
+uint32_t get_current_step_from_eeprom(uint16_t store_address);
 uint32_t get_current_freq_from_eeprom(uint16_t store_address);
 void save_current_freq_to_eeprom(band_data_t band_data);
 void dds_set_freq(uint32_t freq);
