@@ -299,7 +299,6 @@ TM1638_ConfigDisplay(TM1638_Handler_t *Handler,
   TM1638_StartComunication(Handler);
   TM1638_WriteBytes(Handler, &Data, 1);
   TM1638_StopComunication(Handler);
-
   return TM1638_OK;
 }
 

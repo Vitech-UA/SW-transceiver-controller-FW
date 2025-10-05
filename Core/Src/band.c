@@ -263,7 +263,9 @@ band_data_t get_current_band()
 	{
 		band_to_return = band_80m;
 	}
-	return band_to_return;
+	else band_to_return = band_40m;
+	return band_to_return; //TODO: KOSTILLLLLLLLLLLLLLLLLLLLL
+	//return band_80m;
 }
 
 void dds_set_freq(uint32_t freq)
