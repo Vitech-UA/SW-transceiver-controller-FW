@@ -24,6 +24,7 @@ uint8_t btn_pressed_flag = 0;
 uint8_t active_20m_band_flag = 0;
 uint8_t active_40m_band_flag = 0;
 uint8_t active_80m_band_flag = 0;
+uint8_t active_160m_band_flag = 0;
 
 TM1638_Handler_t Handler;
 
@@ -31,6 +32,7 @@ uint32_t intermediate_frequency_hz = 8865000;
 
 extern I2C_HandleTypeDef hi2c1;
 
+band_data_t band_160m;
 band_data_t band_80m;
 band_data_t band_40m;
 band_data_t band_20m;
@@ -39,16 +41,26 @@ band_data_t prev_band;
 uint32_t prevCounter = 0;
 volatile uint32_t current_freq = 0;
 uint8_t step_index = 1;
-uint16_t freq_steps[MAX_STEPS] =
-{ 10, 50, 100, 500, 1000 };
+uint16_t freq_steps[MAX_STEPS] = { 10, 50, 100, 500, 1000 };
 uint32_t freq_change_step = 50;
-enum
-{
-	BAND_20M = 0, BAND_40M, BAND_80M,
+enum {
+	BAND_20M = 0, BAND_40M, BAND_80M, BAND_160M
 };
 
-void init_bands(void)
-{
+void init_bands(void) {
+
+	band_160m.max_freq = 2000000;
+	band_160m.default_freq = 1900000;
+	band_160m.min_freq = 1800000;
+	band_160m.band_code = 0b0000;
+	band_160m.pre_handler = pre_handler;
+	band_160m.handler = handler;
+	band_160m.post_handler = post_handler;
+	band_160m.band_name = "160m (1.8 MHz)";
+	band_160m.current_freq = 0;
+	band_160m.index = BAND_160M;
+	band_160m.store_address = BAND_160M_STORE_ADDRESS;
+
 	band_80m.max_freq = 3800000;
 	band_80m.default_freq = 3650000;
 	band_80m.min_freq = 3500000;
@@ -87,8 +99,7 @@ void init_bands(void)
 
 }
 
-void pre_handler(band_data_t current_band)
-{
+void pre_handler(band_data_t current_band) {
 	sprintf(UART_BUFFER, "Current band: %s\n", current_band.band_name);
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
@@ -97,8 +108,7 @@ void pre_handler(band_data_t current_band)
 #endif
 	// Якщо з eeprom вичитано якесь не валідне значення частоти, то сетимо туди дефолтне. Кейс нової eeprom/
 	if (current_freq > current_band.max_freq
-			|| current_freq < current_band.min_freq)
-	{
+			|| current_freq < current_band.min_freq) {
 		current_freq = current_band.default_freq;
 	}
 	sprintf(UART_BUFFER, "Current freq: %lu\n", current_freq);
@@ -111,16 +121,14 @@ void pre_handler(band_data_t current_band)
 
 }
 
-void post_handler(band_data_t current_band)
-{
+void post_handler(band_data_t current_band) {
 #ifdef USE_EEPROM
 	save_current_freq_to_eeprom(current_band);
 #endif
 	current_band.current_freq = current_freq;
 }
 
-void save_current_step_to_eeprom(uint16_t step)
-{
+void save_current_step_to_eeprom(uint16_t step) {
 	sprintf(UART_BUFFER, "Save step to eeprom: %i\n", step);
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
@@ -128,8 +136,7 @@ void save_current_step_to_eeprom(uint16_t step)
 
 }
 
-uint32_t get_current_step_from_eeprom(uint16_t store_address)
-{
+uint32_t get_current_step_from_eeprom(uint16_t store_address) {
 	uint32_t step_from_eeprom = 0;
 	step_from_eeprom = EEPROM_read_HAL_based(store_address);
 	sprintf(UART_BUFFER, "Read step from eeprom: %lu\n", step_from_eeprom);
@@ -139,8 +146,7 @@ uint32_t get_current_step_from_eeprom(uint16_t store_address)
 	return step_from_eeprom;
 }
 
-void save_current_freq_to_eeprom(band_data_t band_data)
-{
+void save_current_freq_to_eeprom(band_data_t band_data) {
 	sprintf(UART_BUFFER, "Save to eeprom: %lu\n", current_freq);
 	HAL_UART_Transmit(&huart2, (uint8_t*) UART_BUFFER, strlen(UART_BUFFER),
 			100);
@@ -148,8 +154,7 @@ void save_current_freq_to_eeprom(band_data_t band_data)
 
 }
 
-uint32_t get_current_freq_from_eeprom(uint16_t store_address)
-{
+uint32_t get_current_freq_from_eeprom(uint16_t store_address) {
 	uint32_t freq_from_eeprom = 0;
 	freq_from_eeprom = EEPROM_read_HAL_based(store_address);
 	sprintf(UART_BUFFER, "Read from eeprom: %lu\n", freq_from_eeprom);
@@ -159,22 +164,19 @@ uint32_t get_current_freq_from_eeprom(uint16_t store_address)
 	return freq_from_eeprom;
 }
 
-void handler(band_data_t current_band)
-{
+void handler(band_data_t current_band) {
 
 	encoder_process(current_band);
 	set_preamp(!HAL_GPIO_ReadPin(cEN_PREAMPL_GPIO_Port, cEN_PREAMPL_Pin));
 	set_ATT(!HAL_GPIO_ReadPin(cEN_ATT_GPIO_Port, cEN_ATT_Pin));
 	set_RxTx(!HAL_GPIO_ReadPin(cTx_Rx_GPIO_Port, cTx_Rx_Pin));
-	if (HAL_GPIO_ReadPin(cENC_BTN_GPIO_Port, cENC_BTN_Pin))
-	{
+	if (HAL_GPIO_ReadPin(cENC_BTN_GPIO_Port, cENC_BTN_Pin)) {
 		step_process();
 	}
 
 }
 
-void step_process(void)
-{
+void step_process(void) {
 	TM1638_ConfigDisplay(&Handler, 1, TM1638DisplayStateOFF);
 	if (step_index < MAX_STEPS - 1)
 		step_index++;
@@ -191,13 +193,11 @@ void step_process(void)
 
 }
 
-void band_process(void)
-{
+void band_process(void) {
 	current_band = get_current_band();
 	prev_band = current_band;
 	current_band.pre_handler(current_band);
-	while (prev_band.index == current_band.index)
-	{
+	while (prev_band.index == current_band.index) {
 		current_band.handler(current_band);
 		prev_band = get_current_band();
 	}
@@ -205,37 +205,25 @@ void band_process(void)
 
 }
 
-void encoder_process(band_data_t current_band)
-{
+void encoder_process(band_data_t current_band) {
 	int32_t currCounter = __HAL_TIM_GET_COUNTER(&htim1);
 	currCounter = 32767 - ((currCounter - 1) & 0xFFFF);
-	if (currCounter != prevCounter)
-	{
+	if (currCounter != prevCounter) {
 		int32_t delta = currCounter - prevCounter;
 		prevCounter = currCounter;
-		if ((delta > -10) && (delta < 10))
-		{
-			if (delta < 0)
-			{
+		if ((delta > -10) && (delta < 10)) {
+			if (delta < 0) {
 
-				if (current_freq >= current_band.max_freq)
-				{
+				if (current_freq >= current_band.max_freq) {
 					current_freq = current_band.max_freq;
-				}
-				else
-				{
+				} else {
 					current_freq += freq_change_step;
 				}
 
-			}
-			else
-			{
-				if (current_freq <= current_band.min_freq)
-				{
+			} else {
+				if (current_freq <= current_band.min_freq) {
 					current_freq = current_band.min_freq;
-				}
-				else
-				{
+				} else {
 					current_freq -= freq_change_step;
 				}
 
@@ -247,65 +235,85 @@ void encoder_process(band_data_t current_band)
 	}
 }
 
-band_data_t get_current_band()
-{
+band_data_t get_current_band() {
 	band_data_t band_to_return;
-	if (active_20m_band_flag == 1)
-	{
+	if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin) == GPIO_PIN_RESET
+			&& HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_80M_GPIO_Port, BAND_80M_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_160M_GPIO_Port, BAND_160M_Pin)
+					== GPIO_PIN_SET) {
 		band_to_return = band_20m;
 	}
+	else if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin) == GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)
+					== GPIO_PIN_RESET
+			&& HAL_GPIO_ReadPin(BAND_80M_GPIO_Port, BAND_80M_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_160M_GPIO_Port, BAND_160M_Pin)
+					== GPIO_PIN_SET)
 
-	if (active_40m_band_flag == 1)
-	{
+					{
 		band_to_return = band_40m;
 	}
-	if (active_80m_band_flag == 1)
-	{
+
+	else if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin) == GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_80M_GPIO_Port, BAND_80M_Pin)
+					== GPIO_PIN_RESET
+			&& HAL_GPIO_ReadPin(BAND_160M_GPIO_Port, BAND_160M_Pin)
+					== GPIO_PIN_SET) {
 		band_to_return = band_80m;
 	}
-	else band_to_return = band_40m;
-	return band_to_return; //TODO: KOSTILLLLLLLLLLLLLLLLLLLLL
-	//return band_80m;
+
+	else if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin) == GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_80M_GPIO_Port, BAND_80M_Pin)
+					== GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BAND_160M_GPIO_Port, BAND_160M_Pin)
+					== GPIO_PIN_RESET) {
+		band_to_return = band_160m;
+	}
+	else{
+		band_to_return = band_40m;
+	}
+	return band_to_return;
 }
 
-void dds_set_freq(uint32_t freq)
-{
+void dds_set_freq(uint32_t freq) {
 	si5351_set_freq(freq);
 
 }
 
-void print_step(uint16_t step)
-{
+void print_step(uint16_t step) {
 	uint8_t data_to_display[4];
 	data_to_display[0] = step % 10000 / 1000;
 	data_to_display[1] = step % 1000 / 100;
 	data_to_display[2] = step % 100 / 10;
 	data_to_display[3] = step % 10 / 1;
 
-	for (uint8_t i = 0; i <= 5; i++)
-	{
+	for (uint8_t i = 0; i <= 5; i++) {
 		TM1638_SetSingleDigit_HEX(&Handler, 0x78, i); // off
 	}
 
-	if (step >= 10)
-	{
+	if (step >= 10) {
 		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[3], 5);
 		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[2], 4);
 
 	}
-	if (step >= 100)
-	{
+	if (step >= 100) {
 		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[1], 3);
 	}
-	if (step >= 1000)
-	{
+	if (step >= 1000) {
 		TM1638_SetSingleDigit_HEX(&Handler, data_to_display[0], 2);
 	}
 
 }
 
-void print_freq(uint32_t freq)
-{
+void print_freq(uint32_t freq) {
 	uint8_t data_to_display[6];
 	data_to_display[0] = freq % 100000000 / 10000000;
 	data_to_display[1] = freq % 10000000 / 1000000;
@@ -324,8 +332,7 @@ void print_freq(uint32_t freq)
 
 }
 
-void set_band_code(band_data_t current_band)
-{
+void set_band_code(band_data_t current_band) {
 
 	uint8_t mask = current_band.band_code;
 	HAL_GPIO_WritePin(A_GPIO_Port, A_Pin,

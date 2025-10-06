@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define PAD9_Pin GPIO_PIN_13
 #define PAD9_GPIO_Port GPIOC
+#define BAND_160M_Pin GPIO_PIN_14
+#define BAND_160M_GPIO_Port GPIOC
 #define ATT_Pin GPIO_PIN_15
 #define ATT_GPIO_Port GPIOC
 #define xV_BAT_Pin GPIO_PIN_0
@@ -79,13 +81,10 @@ void Error_Handler(void);
 #define D_GPIO_Port GPIOB
 #define BAND_80M_Pin GPIO_PIN_12
 #define BAND_80M_GPIO_Port GPIOB
-#define BAND_80M_EXTI_IRQn EXTI15_10_IRQn
 #define BAND_40M_Pin GPIO_PIN_13
 #define BAND_40M_GPIO_Port GPIOB
-#define BAND_40M_EXTI_IRQn EXTI15_10_IRQn
 #define BAND_20M_Pin GPIO_PIN_14
 #define BAND_20M_GPIO_Port GPIOB
-#define BAND_20M_EXTI_IRQn EXTI15_10_IRQn
 #define TX_OUT_Pin GPIO_PIN_15
 #define TX_OUT_GPIO_Port GPIOB
 #define cENC_A_Pin GPIO_PIN_8
