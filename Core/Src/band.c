@@ -52,6 +52,7 @@ void init_bands(void) {
 	band_160m.max_freq = 2000000;
 	band_160m.default_freq = 1900000;
 	band_160m.min_freq = 1800000;
+	//                    0bDCBA
 	band_160m.band_code = 0b0000;
 	band_160m.pre_handler = pre_handler;
 	band_160m.handler = handler;
@@ -64,7 +65,8 @@ void init_bands(void) {
 	band_80m.max_freq = 3800000;
 	band_80m.default_freq = 3650000;
 	band_80m.min_freq = 3500000;
-	band_80m.band_code = 0b1000;
+	//                   0bDCBA
+	band_80m.band_code = 0b0001;
 	band_80m.pre_handler = pre_handler;
 	band_80m.handler = handler;
 	band_80m.post_handler = post_handler;
@@ -76,7 +78,8 @@ void init_bands(void) {
 	band_40m.max_freq = 7200000;
 	band_40m.default_freq = 7100000;
 	band_40m.min_freq = 7000000;
-	band_40m.band_code = 0b0100;
+	//                   0bDCBA
+	band_40m.band_code = 0b0010;
 	band_40m.pre_handler = pre_handler;
 	band_40m.handler = handler;
 	band_40m.post_handler = post_handler;
@@ -88,7 +91,8 @@ void init_bands(void) {
 	band_20m.max_freq = 14350000;
 	band_20m.default_freq = 14175000;
 	band_20m.min_freq = 14000000;
-	band_20m.band_code = 0b0010;
+	//                   0bDCBA
+	band_20m.band_code = 0b0100;
 	band_20m.pre_handler = pre_handler;
 	band_20m.handler = handler;
 	band_20m.post_handler = post_handler;
