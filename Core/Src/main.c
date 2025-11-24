@@ -107,13 +107,13 @@ int main(void)
 	//System Init
 	i2c_check_devices();
 	init_bands();
-	void set_band_after_start();
+	set_band_after_start();
 	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	HAL_TIM_Base_Start_IT(&htim2);
 	TM1638_Platform_Init(&Handler);
 	TM1638_Init(&Handler, TM1638DisplayTypeComAnode);
 	TM1638_ConfigDisplay(&Handler, 6, TM1638DisplayStateON);
-	dds_set_freq(16000000);
+
 
   /* USER CODE END 2 */
 

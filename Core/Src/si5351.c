@@ -371,7 +371,7 @@ void si5351_set_freq(uint32_t freq_hz) {
 	si5351OutputConfig_t out_conf;
 	si5351_Calc(freq_hz, &pll_conf, &out_conf);
 	si5351_SetupPLL(SI5351_PLL_A, &pll_conf);
-	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_2MA, &out_conf,
+	si5351_SetupOutput(0, SI5351_PLL_A, SI5351_DRIVE_STRENGTH_8MA, &out_conf,
 			0);
 	si5351_EnableOutputs(1 << 0);
 
