@@ -28,7 +28,7 @@ uint8_t active_160m_band_flag = 0;
 
 TM1638_Handler_t Handler;
 
-uint32_t intermediate_frequency_hz = 8865000;
+uint32_t intermediate_frequency_hz = 8680000;
 
 extern I2C_HandleTypeDef hi2c1;
 
@@ -99,7 +99,7 @@ void init_bands(void) {
 	band_20m.band_name = "20m (14.175 MHz)";
 	band_20m.current_freq = 0;
 	band_20m.index = BAND_20M;
-	band_20m.store_address = BAND_80M_STORE_ADDRESS;
+	band_20m.store_address = BAND_20M_STORE_ADDRESS;
 
 }
 
