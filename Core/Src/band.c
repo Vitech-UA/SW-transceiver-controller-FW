@@ -198,12 +198,20 @@ void step_process(void) {
 }
 
 void band_process(void) {
+
 	current_band = get_current_band();
 	prev_band = current_band;
 	current_band.pre_handler(current_band);
 	while (prev_band.index == current_band.index) {
 		current_band.handler(current_band);
 		prev_band = get_current_band();
+
+		if (HAL_GPIO_ReadPin(TX_BUTTON_GPIO_Port, TX_BUTTON_Pin)
+				== GPIO_PIN_RESET) {
+			set_RxTx(Tx);
+		} else {
+			set_RxTx(Rx);
+		}
 	}
 	current_band.post_handler(current_band);
 
@@ -249,8 +257,8 @@ band_data_t get_current_band() {
 			&& HAL_GPIO_ReadPin(BAND_160M_GPIO_Port, BAND_160M_Pin)
 					== GPIO_PIN_SET) {
 		band_to_return = band_20m;
-	}
-	else if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin) == GPIO_PIN_SET
+	} else if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin)
+			== GPIO_PIN_SET
 			&& HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)
 					== GPIO_PIN_RESET
 			&& HAL_GPIO_ReadPin(BAND_80M_GPIO_Port, BAND_80M_Pin)
@@ -280,8 +288,7 @@ band_data_t get_current_band() {
 			&& HAL_GPIO_ReadPin(BAND_160M_GPIO_Port, BAND_160M_Pin)
 					== GPIO_PIN_RESET) {
 		band_to_return = band_160m;
-	}
-	else{
+	} else {
 		band_to_return = band_40m;
 	}
 	return band_to_return;

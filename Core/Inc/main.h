@@ -67,8 +67,8 @@ void Error_Handler(void);
 #define xV_BAT_GPIO_Port GPIOA
 #define PREAMP_Pin GPIO_PIN_1
 #define PREAMP_GPIO_Port GPIOA
-#define SWR_Pin GPIO_PIN_4
-#define SWR_GPIO_Port GPIOA
+#define TX_BUTTON_Pin GPIO_PIN_4
+#define TX_BUTTON_GPIO_Port GPIOA
 #define cEN_PREAMPL_Pin GPIO_PIN_0
 #define cEN_PREAMPL_GPIO_Port GPIOB
 #define A_Pin GPIO_PIN_1
