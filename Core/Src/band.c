@@ -20,6 +20,9 @@ extern char UART_BUFFER[40];
 #define USE_EEPROM
 #define MAX_STEPS 5
 
+
+uint16_t corect = 3500;
+
 uint8_t btn_pressed_flag = 0;
 uint8_t active_20m_band_flag = 0;
 uint8_t active_40m_band_flag = 0;
@@ -295,7 +298,8 @@ band_data_t get_current_band() {
 }
 
 void dds_set_freq(uint32_t freq) {
-	si5351_set_freq(freq);
+
+	si5351_set_freq(freq - corect);
 
 }
 

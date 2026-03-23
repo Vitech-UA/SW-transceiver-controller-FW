@@ -366,7 +366,7 @@ void si5351_writeBulk(uint8_t baseaddr, int32_t P1, int32_t P2, int32_t P3, uint
 }
 
 void si5351_set_freq(uint32_t freq_hz) {
-	si5351_Init(13460);
+	si5351_Init(10000);
 	si5351PLLConfig_t pll_conf;
 	si5351OutputConfig_t out_conf;
 	si5351_Calc(freq_hz, &pll_conf, &out_conf);
