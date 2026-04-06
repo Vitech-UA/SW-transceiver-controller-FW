@@ -20,7 +20,6 @@ extern char UART_BUFFER[40];
 #define USE_EEPROM
 #define MAX_STEPS 5
 
-
 uint16_t corect = 3500;
 
 uint8_t btn_pressed_flag = 0;
@@ -123,7 +122,15 @@ void pre_handler(band_data_t current_band) {
 			100);
 	step_index = get_current_step_from_eeprom(STEP_STORE_ADDRESS);
 	set_band_code(current_band);
-	dds_set_freq(current_freq + intermediate_frequency_hz);
+
+	// Для Діапазонів 40м.80м.160м - Частота + ПЧ
+	if (current_band.index == BAND_160M || current_band.index == BAND_80M
+			|| current_band.index == BAND_40M) {
+		dds_set_freq(current_freq + intermediate_frequency_hz);
+	} else {
+		// Для Діапазонів 20м.10м - Частота - ПЧ
+		dds_set_freq(current_freq - intermediate_frequency_hz);
+	}
 	print_freq(current_freq);
 
 }
