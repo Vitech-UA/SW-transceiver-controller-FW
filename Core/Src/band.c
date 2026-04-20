@@ -20,7 +20,7 @@ extern char UART_BUFFER[40];
 #define USE_EEPROM
 #define MAX_STEPS 5
 
-uint16_t corect = 3900;
+uint16_t corect = 3910;
 
 uint8_t btn_pressed_flag = 0;
 uint8_t active_20m_band_flag = 0;
